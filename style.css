@@ -1,0 +1,517 @@
+/* ========================================
+   Coach Bien-Être - Style simple avec onglets classeur
+   ======================================== */
+
+/* Palette pastel simple */
+:root {
+  --bg-color: #f5f0f5;
+  --bg-panel: #fdfbfd;
+  --primary-color: #d4a5d4;
+  --primary-dark: #c890c8;
+  --text-color: #4a3d4a;
+  --text-light: #7a6d7a;
+  --border-color: #e8d8e8;
+  --tab-inactive: #eee5ee;
+  --tab-hover: #e0d0e0;
+  --tab-active-bg: #fdfbfd;
+  --shadow-soft: 0 2px 8px rgba(212, 165, 212, 0.2);
+  --shadow-medium: 0 4px 16px rgba(200, 144, 200, 0.25);
+}
+
+/* Reset & base */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Réserve la place de la barre de défilement : évite le décalage
+   horizontal de la carte quand on passe d'un panneau long à un panneau court */
+html {
+  scrollbar-gutter: stable;
+}
+
+body {
+  font-family: Georgia, 'Times New Roman', serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  line-height: 1.6;
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+/* ========================================
+   Structure binder / onglets classeur
+   ======================================== */
+
+.binder {
+  position: relative;
+  max-width: 960px;
+  margin: 0 auto;
+  background: var(--bg-panel);
+  border-radius: 12px;
+  box-shadow: var(--shadow-medium);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+/* Couverture illustrée, au-dessus des onglets */
+.binder-cover {
+  margin: 0;
+  background: #ffffff;
+  line-height: 0;
+}
+
+.binder-cover-link {
+  display: block;
+  cursor: zoom-in;
+}
+
+.binder-cover img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Barre supérieure colorée */
+.binder::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--primary-color);
+  pointer-events: none;
+}
+
+.binder-tabs {
+  display: flex;
+  background: white;
+  border-bottom: 3px solid var(--primary-color);
+  position: relative;
+  z-index: 5;
+  padding: 0.6rem 1.5rem 0;
+  gap: 6px;
+  overflow-x: auto;
+  /* Barre de défilement rendue invisible sans libérer sa hauteur :
+     la mise en page reste identique, l'ascenseur ne se voit plus. */
+  scrollbar-color: transparent transparent;
+}
+
+.binder-tabs::-webkit-scrollbar {
+  background: transparent;
+}
+
+.binder-tabs::-webkit-scrollbar-thumb {
+  background: transparent;
+}
+
+/* Style unifié et alterné des onglets */
+.binder-tab {
+  background: #e8d8e8;
+  border: none;
+  border-radius: 8px 8px 0 0;
+  color: #6a4d6a;
+  padding: 0.7rem 1.15rem;
+  cursor: pointer;
+  font-family: Georgia, serif;
+  font-size: 0.92rem;
+  font-weight: 500;
+  line-height: 1.2;
+  transition: background 0.2s ease, color 0.2s ease;
+  position: relative;
+  z-index: 2;
+  min-width: 104px;
+  text-align: center;
+  box-sizing: border-box;
+  align-self: flex-end;
+}
+
+/* Alternance pour l'effet intercalaire : clair / moyen */
+.binder-tab:nth-child(odd) {
+  background: #fec2e7;
+  color: #4a3d4a;
+}
+
+.binder-tab:nth-child(even) {
+  background: #fd88d6;
+  color: white;
+}
+
+.binder-tab:hover:not(.active) {
+  background: #d8c0d8;
+  color: #4a3d4a;
+}
+
+.binder-tab.active {
+  color: white;
+  background: #ea39c1;
+  z-index: 6;
+  box-shadow: none;
+}
+
+/* Focus visible pour navigation clavier */
+.binder-tab:focus-visible {
+  outline: 2px solid var(--primary-dark);
+  outline-offset: 2px;
+  border-radius: 8px;
+  z-index: 7;
+}
+
+/* La ligne de base est portée par la bordure basse de .binder-tabs :
+   plus de pseudo-élément redondant, donc plus de double trait ni de blanc. */
+
+/* ========================================
+   Contenu panneaux
+   ======================================== */
+
+.binder-content {
+  padding: 2rem 2.5rem;
+  background: var(--bg-panel);
+}
+
+.binder-panel {
+  display: none;
+  animation: panelFadeIn 0.3s ease forwards;
+}
+
+.binder-panel.active {
+  display: block;
+}
+
+@keyframes panelFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+h2 {
+  color: #ea39c1;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--border-color);
+  font-size: 1.5rem;
+  font-weight: 400;
+  font-style: italic;
+}
+
+h3 {
+  color: var(--text-color);
+  margin: 2rem 0 0.75rem;
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+h4 {
+  color: var(--text-color);
+  margin: 1.5rem 0 0.5rem;
+  font-size: 1.02rem;
+  font-weight: 600;
+  font-style: italic;
+}
+
+p {
+  margin-bottom: 1.2rem;
+  text-align: justify;
+  line-height: 1.7;
+  font-size: 1.05rem;
+}
+
+ul {
+  margin-bottom: 1.5rem;
+  margin-left: 1.5rem;
+  line-height: 1.7;
+}
+
+li {
+  margin-bottom: 0.6rem;
+  list-style-type: disc;
+}
+
+/* Soulignés de mise en valeur (repris du document source) */
+u {
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--text-light);
+}
+
+/* Titres colorés (onglet Déroulement) — conserve la graisse d'origine */
+.titre-violet {
+  color: #ea39c1;
+}
+
+/* Variante sans gras d'un titre coloré */
+.titre-violet-normal {
+  font-weight: 400;
+}
+
+/* Mise en couleur des expressions clés (onglet Accueil) */
+.accent-violet {
+  color: #ea39c1;
+  font-weight: 600;
+}
+
+/* Expressions clés de l'onglet Accueil remises en gras */
+#panel-accueil .accent-violet {
+  font-weight: 700;
+}
+
+.smiley {
+  font-size: 1.15em;
+  line-height: 1;
+}
+
+/* Phrase d'accroche de l'onglet « Pour qui » */
+.bonne-nouvelle {
+  font-size: 1.2rem;
+  margin-top: 1.25rem;
+}
+
+/* ========================================
+   Section Accueil - Héro
+   ======================================== */
+
+.accueil-hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: center;
+  min-height: 420px;
+  /* padding: 2rem 0;*/
+}
+
+.accueil-photo {
+  grid-column: 1;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow-medium);
+}
+
+.accueil-photo img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.accueil-text {
+  grid-column: 2;
+}
+
+.accueil-text h2 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+  font-weight: 400;
+  line-height: 1.3;
+  color: #ea39c1;
+  font-style: italic;
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 0.5rem;
+}
+
+/* Hero title - consistent with other h2 headings */
+
+/* Texte d'invitation dans l'onglet Mon approche */
+.approche-invitation {
+  color: #ea39c1;
+  font-weight: 700;
+}
+
+/* Image dans l'onglet Mon approche */
+.approche-image {
+  margin: 2rem 0;
+  text-align: center;
+}
+
+.approche-image img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: var(--shadow-medium);
+  display: inline-block;
+}
+
+.accueil-text p {
+  margin-bottom: 1.2rem;
+  font-size: 1.05rem;
+  color: #ea39c1;
+  line-height: 1.7;
+}
+
+.accueil-details {
+  /* margin-top: 2.5rem; */
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.accueil-details p {
+  color: var(--text-color);
+}
+
+/* Bouton CTA bleu */
+.btn-cta {
+  display: inline-block;
+  margin-top: 1.5rem;
+  padding: 0.9rem 2.5rem;
+  background: var(--primary-color);
+  color: #ea39c1;
+  text-decoration: none;
+  border-radius: 8px;
+  font-family: Georgia, serif;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 12px rgba(212, 165, 212, 0.3);
+}
+
+.btn-cta:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(200, 144, 200, 0.4);
+}
+
+.btn-cta:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(212, 165, 212, 0.3);
+}
+
+/* ========================================
+   Section Tarifs
+   ======================================== */
+
+.tarifs-grid {
+  margin-top: 1.5rem;
+}
+
+.tarifs-grid p {
+  background: var(--tab-inactive);
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 0.8rem;
+  border-left: 4px solid var(--primary-color);
+  text-align: left;
+}
+
+/* Tarif étudiant */
+.tarif-eta {
+  color: #ea39c1;
+  font-weight: 500;
+}
+
+/* Avertissement sous les tarifs */
+.tarif-avertissement {
+  color: #ea39c1;
+  font-style: italic;
+  margin-top: 1.5rem;
+  font-size: 1.2rem;
+}
+
+/* Tarifs-grid strong */
+.tarifs-grid strong,
+.tarif-price {
+  color: #ea39c1;
+  font-size: 1.1rem;
+}
+
+/* ========================================
+   Section Contact
+   ======================================== */
+
+.contact-phone {
+  color: #ea39c1;
+  font-size: 1.2rem;
+  font-weight: 600;
+  text-decoration-thickness: 2px;
+  text-decoration-color: var(--primary-color);
+  text-underline-offset: 4px;
+}
+
+.contact-phone:hover {
+  text-decoration-color: var(--text-color);
+}
+
+/* ========================================
+   Responsive
+   ======================================== */
+
+@media (max-width: 850px) {
+  body {
+    padding: 1rem;
+  }
+
+  .binder {
+    border-radius: 10px;
+  }
+
+  .binder-tabs {
+    flex-wrap: wrap;
+    overflow-x: visible;
+    padding: 0 1rem;
+  }
+
+  .binder-tab {
+    flex: 1 1 calc(50% - 4px);
+    padding: 0.85rem 0.6rem;
+    font-size: 0.88rem;
+    white-space: normal;
+    text-align: center;
+  }
+
+  .binder-content {
+    padding: 1.5rem 2rem;
+  }
+
+  .accueil-hero {
+    grid-template-columns: 1fr;
+    min-height: auto;
+    padding: 1.5rem 0;
+    gap: 2rem;
+  }
+
+  .accueil-photo,
+  .accueil-text {
+    grid-column: 1;
+  }
+
+  .accueil-text h2 {
+    font-size: 1.6rem;
+  }
+
+  .accueil-photo {
+    order: -1;
+    max-width: 280px;
+    margin: 0 auto 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 0.5rem;
+  }
+
+  h2 {
+    font-size: 1.3rem;
+  }
+
+  .binder-tab {
+    flex: 1 1 calc(50% - 4px);
+    padding: 0.7rem 0.5rem;
+    font-size: 0.8rem;
+    white-space: normal;
+    text-align: center;
+  }
+
+  .accueil-text h2 {
+    font-size: 1.4rem;
+  }
+
+  .accueil-text p {
+    font-size: 1rem;
+  }
+}

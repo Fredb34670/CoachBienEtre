@@ -1,0 +1,37 @@
+# Fichiers de sauvegarde CSS
+style_backup*.css
+style_backup_*.css
+style_backup_pre_*.css
+master_style.css
+majtexte_style.css
+
+# Fichiers de sauvegarde JS
+script_backup*.js
+script_master_ref.js
+
+# Fichiers HTML de secours
+current_index.html
+master_index.html
+index.html.artifact.json
+index.html.bak
+
+# Dossiers de données non nécessaires
+Data/
+a53b5d6e-90eb-4de7-8159-d6465a8c8ed4/
+
+# Fichiers temporaires et patchs
+style_diff.patch
+
+# Fichiers de documentation non essentiels
+PRODUCT.md
+
+# IDE / éditeur
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
