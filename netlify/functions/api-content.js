@@ -15,6 +15,35 @@ const corsHeaders = {
 
 const CONTENT_BLOB_KEY = 'site-content-v1';
 
+// Les deploy stores vivent dans une des 5 régions Netlify. La région du site
+// n'est pas exposée dans l'événement de fonction : on la découvre automatiquement
+// (première région où le store répond) et on la met en cache pour la durée
+// de vie de l'instance.
+const CANDIDATE_REGIONS = ['us-east-1', 'us-east-2', 'eu-central-1', 'ap-southeast-1', 'ap-southeast-2'];
+let regionCache = null;
+
+async function getStore() {
+  if (regionCache) return getDeployStore({ region: regionCache });
+  let lastError;
+  for (const region of CANDIDATE_REGIONS) {
+    try {
+      const store = await getDeployStore({ region });
+      // Aller-retour de contrôle : la région est validée seulement si
+      // l'écriture ET la lecture fonctionnent réellement
+      await store.set('__region_probe__', 'ok');
+      const probe = await store.get('__region_probe__');
+      if (probe && (await probe.text()) === 'ok') {
+        regionCache = region;
+        return store;
+      }
+    } catch (e) {
+      lastError = e;
+    }
+  }
+  if (lastError) throw lastError;
+  throw new Error('Impossible de déterminer une région Netlify Blobs fonctionnelle');
+}
+
 // Clé de signature des jetons de session admin (jamais présente dans le code public :
 // elle est définie comme variable d'environnement dans le dashboard Netlify)
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -78,7 +107,7 @@ exports.handler = async (event, context) => {
 
 async function getContent() {
   try {
-    const store = await getDeployStore({ region: "auto" });
+    const store = await getStore();
     const blob = await store.get(CONTENT_BLOB_KEY);
 
     if (blob) {
@@ -136,7 +165,7 @@ async function getAllSectionsLocal() {
 
 async function saveContent(body) {
   try {
-    const store = await getDeployStore({ region: "auto" });
+    const store = await getStore();
     await store.set(CONTENT_BLOB_KEY, JSON.stringify({
       ...body,
       updated: new Date().toISOString()
