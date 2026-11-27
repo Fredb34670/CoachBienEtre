@@ -2,6 +2,9 @@
 [build]
   publish = "."
   functions = "netlify/functions"
+  # Installe les dépendances des fonctions (notamment @netlify/blobs)
+  # sans générer de node_modules à la racine du site
+  command = "npm install --prefix netlify/functions --omit=dev"
 
 [[redirects]]
   from = "/admin/*"
