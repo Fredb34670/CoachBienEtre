@@ -1,9 +1,13 @@
-// Admin Interface Script with Netlify Identity
+// Admin Interface Script — connexion par mot de passe (fonction Netlify /login)
+// Le mot de passe n'est jamais présent dans ce fichier : il est vérifié côté
+// serveur contre une variable d'environnement (hash scrypt) et un jeton de
+// session signé (HMAC, 12 h) est renvoyé.
 
 const PAGES = ['accueil', 'pourqui', 'deroulement', 'approche', 'tarifs', 'activites', 'contact'];
 
-// Email administrateur autorisé (seul accès au panneau)
-const ADMIN_EMAIL = 'fbaranes@gmail.com';
+const TOKEN_KEY = 'adminToken';
+const API_LOGIN = '/.netlify/functions/login';
+const API_CONTENT = '/.netlify/functions/api-content';
 
 let current = 'accueil';
 let data = { blocks: [] };
@@ -15,50 +19,23 @@ const admin = {
     this.checkAuth();
   },
 
+  // ---- Authentification (jeton de session stocké en localStorage) ----
+
   checkAuth() {
-    // Netlify Identity check
-    if (typeof netlifyIdentity !== 'undefined') {
-      const isAllowed = (user) =>
-        user && user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
-
-      netlifyIdentity.on('login', (user) => {
-        if (isAllowed(user)) {
-          this.onLogin(user);
-        } else {
-          // Session ouverte pour un autre compte → on la ferme
-          this.toast('Accès réservé à l\'administrateur');
-          netlifyIdentity.logout();
-          this.showLogin();
-        }
-      });
-      netlifyIdentity.on('logout', () => {
-        this.onLogout();
-      });
-
-      const currentUser = netlifyIdentity.currentUser();
-      if (currentUser && currentUser.loggedIn) {
-        if (isAllowed(currentUser)) {
-          this.onLogin(currentUser);
-        } else {
-          // Session existante non autorisée → déconnexion forcée
-          this.toast('Session non autorisée : déconnecté');
-          netlifyIdentity.logout();
-          this.showLogin();
-        }
-      } else {
-        this.showLogin();
-      }
+    const token = localStorage.getItem(TOKEN_KEY);
+    if (token && tokenAlive(token)) {
+      this.onLogin();
     } else {
-      console.error('Netlify Identity not loaded');
-      this.toast('Erreur: Identity non chargé');
+      if (token) localStorage.removeItem(TOKEN_KEY);
       this.showLogin();
     }
   },
 
-  onLogin(user) {
+  onLogin() {
     document.getElementById('view-login').hidden = true;
     document.getElementById('view-admin').hidden = false;
-    document.getElementById('userInfo').textContent = `Connecté en tant que ${user.email}`;
+    const info = document.getElementById('userInfo');
+    if (info) info.textContent = 'Connecté en tant qu\'administrateur';
     this.showPage('accueil');
   },
 
@@ -68,50 +45,48 @@ const admin = {
   },
 
   showLogin() {
-    document.getElementById('login-email').value = '';
-    document.getElementById('login-pwd').value = '';
+    const pwd = document.getElementById('login-pwd');
+    if (pwd) pwd.value = '';
   },
 
   login() {
-    const email = document.getElementById('login-email').value.trim();
     const pwd = document.getElementById('login-pwd').value;
-    
-    if (!email) {
-      admin.toast('Entrez votre email');
-      return;
-    }
-    
+
     if (!pwd) {
-      admin.toast('Entrez votre mot de passe');
-      return;
-    }
-    
-    // Vérification email administrateur (constante globale)
-    if (email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
-      admin.toast('Accès administrateur réservé à ' + ADMIN_EMAIL);
+      admin.toast('Entrez le mot de passe administrateur');
       return;
     }
 
-    // Netlify Identity login
-    netlifyIdentity.login({ email, password: pwd })
-      .then(user => {
-        // Vérification double - email doit correspondre exactement
-        if (user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
-          admin.toast('Connexion admin réussie');
-          admin.onLogin(user);
+    fetch(API_LOGIN, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pwd })
+    })
+      .then(r => r.json().catch(() => ({})).then(j => ({ ok: r.ok, status: r.status, j })))
+      .then(({ ok, status, j }) => {
+        if (ok && j.token) {
+          localStorage.setItem(TOKEN_KEY, j.token);
+          admin.toast('Connexion réussie');
+          admin.onLogin();
+        } else if (status === 429) {
+          admin.toast('Trop de tentatives : réessayez plus tard');
+        } else if (status === 500) {
+          admin.toast('Serveur non configuré (variables d\'environnement manquantes)');
         } else {
-          admin.toast('Accès administrateur refusé');
-          netlifyIdentity.logout();
+          admin.toast('Mot de passe incorrect');
         }
       })
-      .catch(err => {
-        admin.toast(err.message || 'Échec connexion');
-      });
+      .catch(() => admin.toast('Erreur réseau'));
   },
 
   logout() {
-    netlifyIdentity.logout();
+    localStorage.removeItem(TOKEN_KEY);
+    admin.onLogout();
+    admin.showLogin();
+    admin.toast('Déconnecté');
   },
+
+  // ---- Interface ----
 
   buildNav() {
     document.getElementById('navList').innerHTML = PAGES.map(p => {
@@ -188,15 +163,17 @@ const admin = {
       </div>`;
   },
 
-  escapeHtml(str) { return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); },
+  escapeHtml(str) { return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); },
 
   initBlocks() {
     document.querySelectorAll('.rich').forEach(el => {
       if (!el.hasAttribute('data-trumbowyg')) {
-        $(el).trumbowyg({ autoparse: false });
-        el.setAttribute('data-trumbowyg', 'true');
+        if (typeof $ !== 'undefined' && $.fn.trumbowyg) {
+          $(el).trumbowyg({ autoparse: false });
+          el.setAttribute('data-trumbowyg', 'true');
+        }
+        el.addEventListener('input', () => admin.markDirty());
       }
-      el.addEventListener('input', () => admin.markDirty());
     });
   },
 
@@ -242,39 +219,42 @@ const admin = {
     el.className = 'saveInfo ' + (dirty ? 'dirty' : 'clean');
   },
   reset() { data = { blocks: [] }; dirty = 0; admin.renderBlocks(); admin.toast('Réinitialisé'); },
-  
+
   async save() {
     if (!dirty) { admin.toast('Rien à sauvegarder'); return; }
-    
-    const user = netlifyIdentity.currentUser();
-    const token = user ? user.token : null;
-    
+
+    const token = localStorage.getItem(TOKEN_KEY);
+    if (!token || !tokenAlive(token)) {
+      admin.toast('Session expirée : reconnectez-vous');
+      admin.logout();
+      return;
+    }
+
     try {
-      const r = await fetch('/.netlify/functions/api-content', {
+      const r = await fetch(API_CONTENT, {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ page: current, content: data })
       });
-      
+
       if (r.ok) {
         const res = await r.json();
-        if (res.token) localStorage.setItem('adminToken', res.token);
         admin.toast('✓ Sauvegardé');
         dirty = 0; admin.updateSaveInfo();
       } else if (r.status === 401 || r.status === 403) {
-        // Session expirée ou compte non autorisé → reconnexion requise
-        localStorage.removeItem('adminToken');
+        // Jeton invalide ou expiré → reconnexion
+        localStorage.removeItem(TOKEN_KEY);
         admin.toast('Session expirée ou non autorisée : reconnectez-vous');
-        netlifyIdentity.logout();
+        admin.logout();
       } else {
         const err = await r.json().catch(() => ({}));
-        admin.toast('Erreur: ' + (err.error || 'serveur')); 
+        admin.toast('Erreur: ' + (err.error || 'serveur'));
       }
-    } catch (e) { 
-      admin.toast('Erreur réseau'); 
+    } catch (e) {
+      admin.toast('Erreur réseau');
     }
   },
 
@@ -284,6 +264,19 @@ const admin = {
     setTimeout(() => { t.className = 'toast'; }, 2600);
   }
 };
+
+// Le jeton de session (émis par /login, signé côté serveur) contient
+// son d'expiration dans le payload — vérification locale, simple et sûre :
+// seule l'API (qui possède la clé HMAC) peut décider de l'écriture.
+function tokenAlive(token) {
+  try {
+    const payloadB64 = String(token).split('.')[0];
+    const payload = JSON.parse(Buffer.from(payloadB64.replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString());
+    return typeof payload.exp === 'number' && payload.exp > Date.now();
+  } catch {
+    return false;
+  }
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   admin.init();

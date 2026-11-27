@@ -4,6 +4,7 @@
  * Utilise Netlify Blob pour le stockage persistant (gratuit jusqu'à 5 Mo)
  */
 
+const crypto = require('crypto');
 const { createClient } = require('@netlify/blobs');
 
 const corsHeaders = {
@@ -14,10 +15,9 @@ const corsHeaders = {
 const blobStore = createClient({ useBundledBlob: true });
 const CONTENT_BLOB_KEY = 'site-content-v1';
 
-// Email administrateur autorisé à écrire le contenu.
-// Configurable via la variable d'environnement ADMIN_EMAIL dans Netlify
-// (Site settings → Environment variables). Valeur par défaut identique à admin.js
-const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || 'fbaranes@gmail.com').toLowerCase();
+// Le jeton d'écriture est le jeton de session admin émis par la fonction /login,
+// signé avec la variable d'environnement JWT_SECRET. La lecture (GET) reste publique.
+const JWT_SECRET = process.env.JWT_SECRET;
 
 exports.handler = async (event, context) => {
   const httpMethod = event.httpMethod;
@@ -33,7 +33,7 @@ exports.handler = async (event, context) => {
 
     // Authentification nécessaire pour POST
     if (httpMethod === 'POST') {
-      if (!validateIdentityToken(token)) {
+      if (!validateAdminToken(token)) {
         return {
           statusCode: 401,
           headers: corsHeaders,
@@ -147,36 +147,30 @@ async function saveContent(body) {
   }
 }
 
-function validateIdentityToken(token) {
-  // Validation du token Netlify Identity + restriction à l'email administrateur.
-  // Les tokens Identity sont des JWT signés par Netlify : on vérifie le format,
-  // la validité (exp) et l'email du porteur. La signature n'est pas vérifiée
-  // côté fonction (la clé publique Netlify n'est pas disponible ici) ;
-  // le contrôle d'email borne l'accès à l'administrateur.
+/**
+ * Valide le jeton de session administrateur émis par la fonction /login :
+ *   <payload base64url>.<signature HMAC-SHA256 base64url>
+ * Le payload est signé avec JWT_SECRET (variable d'environnement, jamais dans le code)
+ * et doit être non expiré. Seuls les jetons signés par le serveur sont acceptés.
+ */
+function validateAdminToken(token) {
+  if (!token || !JWT_SECRET) return false;
 
-  if (!token || token.length < 10) return false;
+  const parts = String(token).split('.');
+  if (parts.length !== 2) return false;
 
+  const [payloadB64, sig] = parts;
+
+  // Vérification de la signature (le seul service en possession de JWT_SECRET peut signer)
+  const expected = crypto.createHmac('sha256', JWT_SECRET).update(payloadB64).digest('base64url');
+  const a = Buffer.from(sig);
+  const b = Buffer.from(expected);
+  if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) return false;
+
+  // Vérification de la date d'expiration
   try {
-    const parts = token.split('.');
-    if (parts.length !== 3) return false;
-
-    // Décoder le payload du JWT (base64url → base64)
-    const b64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
-    const payload = JSON.parse(Buffer.from(b64, 'base64').toString());
-
-    // Token expiré → refus
-    if (payload.exp && payload.exp <= Date.now() / 1000) {
-      return false;
-    }
-
-    // Seule la session de l'administrateur peut écrire le contenu
-    const tokenEmail = (payload.email || (payload.sub || '')).toLowerCase();
-    if (tokenEmail !== ADMIN_EMAIL) {
-      console.warn('Écriture refusée : token non administrateur (', tokenEmail || 'email manquant', ')');
-      return false;
-    }
-
-    return true;
+    const payload = JSON.parse(Buffer.from(payloadB64.replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString());
+    return typeof payload.exp === 'number' && payload.exp > Date.now();
   } catch {
     return false;
   }

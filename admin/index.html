@@ -101,7 +101,7 @@
 </style>
 </head>
 <body>
-<div class="banner">MAQUETTE ADMIN – Modifications ne sont pas enregistrées réellement</div>
+<div class="banner">Espace administration – Coach Bien-Être</div>
 
 <!-- Login View -->
 <div id="view-login" class="login-wrap">
@@ -110,12 +110,9 @@
     <h1>Espace administration</h1>
     <p>Connectez-vous pour modifier le contenu du site.<br><em>Coach Bien-Être</em></p>
     <div id="userInfo" style="margin-bottom:16px;color:var(--violet);font-weight:600;display:none;"></div>
-    <label for="login-email">Email</label>
-    <input type="email" id="login-email" placeholder="votre@email.com">
-    <label for="login-pwd">Mot de passe</label>
-    <input type="password" id="login-pwd" placeholder="Votre mot de passe">
+    <label for="login-pwd">Mot de passe administrateur</label>
+    <input type="password" id="login-pwd" placeholder="Votre mot de passe" autocomplete="current-password">
     <button style="width:100%" onclick="admin.login()">Se connecter</button>
-    <button style="width:100%;margin-top:8px" class="btn-ghost" onclick="netlifyIdentity.open('signup')">Créer un compte</button>
   </div>
 </div>
 
@@ -146,12 +143,8 @@
 
 <div class="toast" id="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/trumbowyg@2.25.1/dist/trumbowyg.min.js"></script>
-<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-<script>
-  // Initialiser Netlify Identity Widget
-  netlifyIdentity.init();
-</script>
 <script src="admin.js"></script>
 </body>
 </html>
