@@ -1,0 +1,628 @@
+/* ========================================
+   Coach Bien-Être - Style simple avec onglets classeur
+   ======================================== */
+
+/* Palette pastel simple */
+:root {
+  --bg-color: #f5f0f5;
+  --bg-panel: #fdfbfd;
+  --primary-color: #d4a5d4;
+  --primary-dark: #c890c8;
+  --text-color: #4a3d4a;
+  --text-light: #7a6d7a;
+  --border-color: #e8d8e8;
+  --tab-inactive: #eee5ee;
+  --tab-hover: #e0d0e0;
+  --tab-active-bg: #fdfbfd;
+  --shadow-soft: 0 2px 8px rgba(212, 165, 212, 0.2);
+  --shadow-medium: 0 4px 16px rgba(200, 144, 200, 0.25);
+}
+
+/* Reset & base */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Réserve la place de la barre de défilement : évite le décalage
+   horizontal de la carte quand on passe d'un panneau long à un panneau court */
+html {
+  scrollbar-gutter: stable;
+}
+
+body {
+  font-family: Georgia, 'Times New Roman', serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  line-height: 1.6;
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+/* ========================================
+   Structure binder / onglets classeur
+   ======================================== */
+
+.binder {
+  position: relative;
+  max-width: 960px;
+  margin: 0 auto;
+  background: var(--bg-panel);
+  border-radius: 12px;
+  box-shadow: var(--shadow-medium);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+/* Couverture illustrée, au-dessus des onglets */
+.binder-cover {
+  margin: 0;
+  background: #ffffff;
+  line-height: 0;
+}
+
+.binder-cover-link {
+  display: block;
+  cursor: zoom-in;
+}
+
+.binder-cover img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Barre supérieure colorée */
+.binder::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--primary-color);
+  pointer-events: none;
+}
+
+.binder-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  background: var(--tab-inactive);
+  border-bottom: 3px solid var(--primary-color);
+  position: relative;
+  z-index: 5;
+  padding: 0 1.5rem;
+  gap: 4px;
+  overflow-x: visible;
+}
+
+.binder-tab {
+  background: transparent;
+  border: none;
+  border-radius: 10px 10px 0 0;
+  color: var(--text-light);
+  padding: 1rem 1.5rem;
+  cursor: pointer;
+  font-family: Georgia, serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: color 0.2s ease, background 0.2s ease, transform 0.15s ease;
+  position: relative;
+  z-index: 2;
+  min-width: 120px;
+  text-align: center;
+}
+
+.binder-tab:hover:not(.active) {
+  color: var(--primary-dark);
+  background: var(--tab-hover);
+  transform: translateY(-1px);
+}
+
+.binder-tab.active {
+  color: var(--primary-dark);
+  background: var(--tab-active-bg);
+  z-index: 6;
+  border-bottom: 3px solid var(--tab-active-bg);
+  margin-bottom: -3px;
+}
+
+/* Connecteur visuel sous les onglets actifs */
+.binder-tabs::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--primary-color);
+  z-index: 1;
+  border-radius: 0 0 8px 8px;
+}
+
+/* ========================================
+   Contenu panneaux
+   ======================================== */
+
+.binder-content {
+  padding: 2rem 2.5rem;
+  background: var(--bg-panel);
+}
+
+.binder-panel {
+  display: none;
+  animation: panelFadeIn 0.3s ease forwards;
+}
+
+.binder-panel.active {
+  display: block;
+}
+
+@keyframes panelFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+h2 {
+  color: var(--primary-dark);
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--border-color);
+  font-size: 1.5rem;
+  font-weight: 400;
+  font-style: italic;
+}
+
+h3 {
+  color: var(--text-color);
+  margin: 2rem 0 0.75rem;
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+h4 {
+  color: var(--text-color);
+  margin: 1.5rem 0 0.5rem;
+  font-size: 1.02rem;
+  font-weight: 600;
+  font-style: italic;
+}
+
+p {
+  margin-bottom: 1.2rem;
+  text-align: justify;
+  line-height: 1.7;
+  font-size: 1.05rem;
+}
+
+ul {
+  margin-bottom: 1.5rem;
+  margin-left: 1.5rem;
+  line-height: 1.7;
+}
+
+li {
+  margin-bottom: 0.6rem;
+  list-style-type: disc;
+}
+
+/* Soulignés de mise en valeur (repris du document source) */
+u {
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--text-light);
+}
+
+.smiley {
+  font-size: 1.15em;
+  line-height: 1;
+}
+
+/* ========================================
+   Menu d'authentification (déconnexion/identifiant)
+   ======================================== */
+
+.auth-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.auth-btn {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-family: Georgia, serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: background 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.auth-btn:hover {
+  background: var(--primary-dark);
+}
+
+.auth-btn svg {
+  transition: transform 0.2s ease;
+}
+
+.auth-btn.open svg {
+  transform: rotate(180deg);
+}
+
+.auth-content {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  min-width: 220px;
+  max-height: 400px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow-medium);
+  margin-top: 4px;
+  z-index: 9999; /* Augmenté pour être au-dessus de tout */
+  display: none;
+}
+
+.auth-content.open {
+  display: block;
+}
+
+.auth-content .auth-form,
+.auth-content .auth-menu {
+  padding: 1.5rem;
+  width: 100%;
+}
+
+.auth-content .auth-form,
+.auth-content .auth-menu {
+  padding: 1.5rem;
+  width: 100%;
+}
+
+.auth-form h3,
+.auth-menu h3 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  color: var(--primary-dark);
+}
+
+.auth-form input {
+  width: 100%;
+  padding: 0.6rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-family: Georgia, serif;
+  font-size: 0.95rem;
+}
+
+.auth-form .remember-me {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  font-size: 0.85rem;
+  color: var(--text-light);
+}
+
+.auth-form .btn-submit {
+  width: 100%;
+  padding: 0.6rem;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-family: Georgia, serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.auth-form .btn-submit:hover {
+  background: var(--primary-dark);
+}
+
+.auth-menu {
+  display: none;
+}
+
+.auth-menu.signed-in {
+  display: block;
+}
+
+.auth-menu .user-greeting {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  color: var(--text-color);
+}
+
+.auth-menu .menu-option {
+  width: 100%;
+  padding: 0.6rem 1rem;
+  background: none;
+  border: none;
+  text-align: left;
+  font-family: Georgia, serif;
+  font-size: 0.95rem;
+  color: var(--text-color);
+  cursor: pointer;
+  margin-bottom: 4px;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+}
+
+.auth-menu .menu-option:hover {
+  background: var(--tab-inactive);
+}
+
+.auth-menu .menu-option:last-child {
+  margin-bottom: 0;
+}
+
+/* Section admin WYSIWYG */
+.admin-section {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: var(--tab-inactive);
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  display: none; /* Ajout : cachée par défaut */
+}
+
+.admin-section h3 {
+  color: var(--primary-dark);
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.admin-section .content-editable {
+  min-height: 200px;
+  padding: 1rem;
+  border: 2px dashed var(--primary-color);
+  border-radius: 8px;
+  font-family: Georgia, serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--text-color);
+  background: white;
+}
+
+.admin-section .content-editable:focus {
+  border-color: var(--primary-dark);
+  outline: none;
+}
+
+/* Cacher les onglets natives quand on est en mode connexion */
+/* .binder-tabs {
+  display: none !important;
+} */
+
+/* Container pour le contenu admin */
+#admin-content {
+  padding: 2rem;
+}
+
+/* ========================================
+   Section Accueil - Héro
+   ======================================== */
+
+.accueil-hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: center;
+  min-height: 420px;
+  padding: 2rem 0;
+}
+
+.accueil-photo {
+  grid-column: 1;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow-medium);
+}
+
+.accueil-photo img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.accueil-text {
+  grid-column: 2;
+}
+
+.accueil-text h2 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-size: 2rem;
+  font-weight: 400;
+  line-height: 1.3;
+  color: var(--primary-dark);
+}
+
+.accueil-text p {
+  margin-bottom: 1.2rem;
+  font-size: 1.05rem;
+  color: var(--text-light);
+  line-height: 1.7;
+}
+
+.accueil-details {
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.accueil-details p {
+  color: var(--text-color);
+}
+
+/* Bouton CTA bleu */
+.btn-cta {
+  display: inline-block;
+  margin-top: 1.5rem;
+  padding: 0.9rem 2.5rem;
+  background: var(--primary-color);
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-family: Georgia, serif;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 12px rgba(212, 165, 212, 0.3);
+}
+
+.btn-cta:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(200, 144, 200, 0.4);
+}
+
+.btn-cta:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(212, 165, 212, 0.3);
+}
+
+/* ========================================
+   Section Tarifs
+   ======================================== */
+
+.tarifs-grid {
+  margin-top: 1.5rem;
+}
+
+.tarifs-grid p {
+  background: var(--tab-inactive);
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 0.8rem;
+  border-left: 4px solid var(--primary-color);
+  text-align: left;
+}
+
+.tarifs-grid strong {
+  color: var(--primary-dark);
+  font-size: 1.1rem;
+}
+
+/* ========================================
+   Section Contact
+   ======================================== */
+
+.contact-phone {
+  color: var(--text-color);
+  font-size: 1.2rem;
+  font-weight: 600;
+  text-decoration-thickness: 2px;
+  text-decoration-color: var(--primary-color);
+  text-underline-offset: 4px;
+}
+
+.contact-phone:hover {
+  text-decoration-color: var(--text-color);
+}
+
+/* ========================================
+   Responsive
+   ======================================== */
+
+@media (max-width: 850px) {
+  body {
+    padding: 1rem;
+  }
+
+  .binder {
+    border-radius: 10px;
+  }
+
+  .binder-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 1rem;
+  }
+
+  .binder-tab {
+    flex-shrink: 0;
+    padding: 0.85rem 1rem;
+    font-size: 0.88rem;
+    white-space: nowrap;
+  }
+
+  .binder-content {
+    padding: 1.5rem 2rem;
+  }
+
+  .accueil-hero {
+    grid-template-columns: 1fr;
+    min-height: auto;
+    padding: 1.5rem 0;
+    gap: 2rem;
+  }
+
+  .accueil-photo,
+  .accueil-text {
+    grid-column: 1;
+  }
+
+  .accueil-text h2 {
+    font-size: 1.6rem;
+  }
+
+  .accueil-photo {
+    order: -1;
+    max-width: 280px;
+    margin: 0 auto 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 0.5rem;
+  }
+
+  h2 {
+    font-size: 1.3rem;
+  }
+
+  .binder-tab {
+    padding: 0.7rem 0.9rem;
+    font-size: 0.8rem;
+    min-width: 100px;
+  }
+
+  .accueil-text h2 {
+    font-size: 1.4rem;
+  }
+
+  .accueil-text p {
+    font-size: 1rem;
+  }
+}
+
+/* ========================================
+   Désactivation temporaire de l'authentification
+   ======================================== */
+
+body.auth-disabled .auth-dropdown,
+body.auth-disabled .admin-section {
+  display: none !important;
+}

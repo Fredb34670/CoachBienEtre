@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Administration – Happy-Thérapie-Holistique (MAQUETTE)</title>
+<style>
+  :root {
+    --violet: #6d4c9e;
+    --violet-soft: #efe9f7;
+    --ink: #2e2a33;
+    --muted: #7a7482;
+    --bg: #f7f5fb;
+    --card: #ffffff;
+    --ok: #2e7d32;
+    --line: #e5e0ef;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body { font-family: "Segoe UI", system-ui, sans-serif; background: var(--bg); color: var(--ink); }
+  button { font: inherit; cursor: pointer; }
+
+  .banner { background: var(--violet); color: #fff; text-align: center; padding: 8px 16px; font-size: 14px; }
+
+  /* ---------- Connexion ---------- */
+  .login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+  .login-card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 36px 40px; width: 360px; text-align: center; }
+  .login-card h1 { font-size: 20px; margin: 10px 0 6px; }
+  .login-card p { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
+  .login-logo { font-size: 40px; }
+  .login-card label { display: block; text-align: left; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .login-card input { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; font: inherit; margin-bottom: 18px; }
+  .btn-primary { background: var(--violet); color: #fff; border: 0; border-radius: 8px; padding: 11px 22px; width: 100%; font-size: 15px; }
+  .login-hint { margin-top: 18px; font-size: 12px; color: var(--muted); }
+
+  /* ---------- Barre du haut ---------- */
+  .topbar { background: var(--card); border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; padding: 12px 24px; position: sticky; top: 0; z-index: 5; }
+  .topbar-title { font-size: 17px; font-weight: 600; }
+  .topbar-title span { color: var(--muted); font-weight: 400; font-size: 14px; }
+  .topbar a { color: var(--violet); text-decoration: none; font-size: 14px; margin-right: 18px; }
+  .btn-ghost { background: transparent; border: 1px solid var(--line); border-radius: 8px; padding: 8px 16px; font-size: 14px; color: var(--ink); }
+
+  /* ---------- Layout ---------- */
+  .layout { display: flex; min-height: calc(100vh - 120px); }
+  .sidebar { width: 240px; background: var(--card); border-right: 1px solid var(--line); padding: 20px 12px; flex-shrink: 0; }
+  .sidebar-label { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 14px 8px 6px; }
+  .sidebar ul { list-style: none; }
+  .sidebar button { display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; background: none; border: 0; padding: 9px 12px; border-radius: 8px; font-size: 14.5px; color: var(--ink); }
+  .sidebar button:hover { background: var(--violet-soft); }
+  .sidebar button.active { background: var(--violet); color: #fff; font-weight: 600; }
+
+  .content { flex: 1; padding: 28px 32px 80px; max-width: 880px; }
+  .content h2 { font-size: 22px; margin-bottom: 4px; }
+  .content .page-sub { color: var(--muted); font-size: 14px; margin-bottom: 22px; }
+
+  /* ---------- Blocs ---------- */
+  .block { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; margin-bottom: 16px; }
+  .block-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .block-label { font-size: 13px; font-weight: 600; color: var(--violet); }
+  .block-del { background: none; border: 0; color: #c0392b; font-size: 13px; }
+  .block-del:hover { text-decoration: underline; }
+  .block input[type=text] { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; font: inherit; }
+  .block input:focus, .rich:focus, textarea:focus { outline: 2px solid var(--violet-soft); border-color: var(--violet); }
+
+  .toolbar { display: flex; gap: 4px; margin-bottom: 8px; }
+  .toolbar button { border: 1px solid var(--line); background: #fff; border-radius: 6px; width: 30px; height: 28px; font-size: 13px; color: var(--ink); }
+  .toolbar button:hover { background: var(--violet-soft); }
+  .rich { min-height: 90px; border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; font-size: 15px; line-height: 1.55; background: #fff; }
+
+  .img-preview { border: 1px dashed var(--line); border-radius: 10px; overflow: hidden; background: #fff; margin: 8px 0; }
+  .img-preview img { display: block; max-width: 100%; max-height: 260px; object-fit: cover; }
+  .img-actions { display: flex; gap: 10px; align-items: center; margin-top: 8px; }
+  .img-actions .file-note { font-size: 12px; color: var(--muted); }
+
+  .add-blocks { display: flex; gap: 10px; margin-top: 4px; }
+  .add-blocks button { border: 1px dashed var(--violet); color: var(--violet); background: var(--violet-soft); border-radius: 8px; padding: 9px 16px; font-size: 14px; }
+
+  /* ---------- SEO ---------- */
+  .seo-row { margin-bottom: 16px; }
+  .seo-row label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+  .seo-row input, .seo-row textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; font: inherit; }
+  .seo-row small { color: var(--muted); }
+
+  /* ---------- Barre d'enregistrement ---------- */
+  .savebar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card); border-top: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; padding: 12px 28px; z-index: 6; }
+  .savebar .dirty { color: #b7791f; font-size: 14px; }
+  .savebar .clean { color: var(--muted); font-size: 14px; }
+  .savebar .btn-primary { width: auto; }
+
+  /* ---------- Toast ---------- */
+  .toast { position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%); background: var(--ink); color: #fff; padding: 11px 22px; border-radius: 10px; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .25s; }
+  .toast.show { opacity: 1; }
+  .toast.ok { background: var(--ok); }
+
+  [hidden] { display: none !important; }
+  @media (max-width: 700px) { .layout { flex-direction: column; } .sidebar { width: 100%; } }
+</style>
+</head>
+<body>
+<div class="banner">Ceci est une <strong>maquette</strong> : les modifications ne sont pas réellement enregistrées.</div>
+
+<!-- ===== VUE CONNEXION ===== -->
+<div id="view-login" class="login-wrap">
+  <div class="login-card">
+    <div class="login-logo">🪷</div>
+    <h1>Espace administrateur</h1>
+    <p>Connectez-vous pour modifier les textes et images du site.<br><em>Happy-Thérapie-Holistique · Pierrette Tréguier</em></p>
+    <label for="pwd">Mot de passe</label>
+    <input type="password" id="pwd" placeholder="••••••••">
+    <button class="btn-primary" onclick="login()">Se connecter</button>
+    <p class="login-hint">Accessible uniquement via<br>https://coachbienetre.fr/admin</p>
+  </div>
+</div>
+
+<!-- ===== VUE ADMIN ===== -->
+<div id="view-admin" hidden>
+  <header class="topbar">
+    <div class="topbar-title">Administration <span>· Happy-Thérapie-Holistique</span></div>
+    <div>
+      <a href="../index.html" target="_blank" rel="noopener">Voir le site ↗</a>
+      <button class="btn-ghost" onclick="logout()">Déconnexion</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav class="sidebar">
+      <div class="sidebar-label">Pages du site</div>
+      <ul id="navList"></ul>
+      <div class="sidebar-label">Référencement</div>
+      <ul><li><button id="seoBtn" onclick="showPage('seo')">🔎 SEO &amp; description</button></li></ul>
+    </nav>
+
+    <main class="content" id="content"></main>
+  </div>
+
+  <footer class="savebar">
+    <span id="saveInfo" class="clean">Aucune modification</span>
+    <div style="display:flex; gap:10px;">
+      <button class="btn-ghost" onclick="toast('Modifications annulées (maquette).')">Annuler</button>
+      <button class="btn-primary" onclick="save()">💾 Enregistrer</button>
+    </div>
+  </footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ------- Données : les 7 pages réelles du site ------- */
+const PAGES = [
+  { id:'accueil', label:'Accueil', icon:'🏠', blocks:[
+      { type:'image', label:'Photo du thérapeute', src:'images/moi-therapeute-sans-les-lunettes.png', file:'moi-therapeute-sans-les-lunettes.png' },
+      { type:'title', label:'Titre principal', value:'Retrouvez sérénité et joie de vivre' },
+      { type:'text',  label:'Introduction', value:'Je vous propose de vous accompagner pour :' },
+      { type:'text',  label:'Ce que j\'aide à retrouver ou libérer', value:'retrouver plus de sérénité, de joie, d\'estime et de confiance en vous ; vous libérer de l\'anxiété, de l\'angoisse, du stress chronique, de peurs, ou d\'émotions invalidantes ; vous libérer de souffrances, de chocs émotionnels, de blocages, de souvenirs douloureux ou traumatiques ; vous aider à faire le deuil d\'une situation difficile, d\'un proche... ; interrompre des automatismes inadaptés (ruminations, défaitisme, procrastination, auto-sabotage…).', list:true },
+      { type:'text',  label:'Le but de mes séances', value:'Le but de mes séances est de vous permettre de retrouver une joie de vie, de vous libérer de vos limitations inconscientes ou blocages et d\'installer des réponses plus apaisées et adaptées aux circonstances…' },
+      { type:'text',  label:'Mes outils', value:'Durant mes séances, je vous accompagne par une écoute active et bienveillante. Pour cela, j\'utilise des outils de coaching, de thérapies brèves comme l\'hypnose Ericksonienne ou la thérapie MOSAIC, moins connue que l\'EMDR tout autant efficace mais en étant plus douce…' },
+  ]},
+  { id:'pourqui', label:'Pour qui', icon:'👥', blocks:[
+      { type:'title', label:'Titre', value:'À qui s\'adresse mon accompagnement ?' },
+      { type:'text',  label:'Personnes accompagnées', value:'aux personnes qui peuvent éprouver des difficultés à réguler leurs émotions (stress, angoisse, peur, colère...) ; aux personnes qui ont une faible estime d\'elles-mêmes, des croyances limitantes ; aux personnes qui ont du mal à se faire confiance ; aux personnes qui ont des blocages, des souffrances, des blessures traumatiques ; aux personnes qui se sentent perdues, différentes…', list:true },
+      { type:'text',  label:'Conséquences sur le corps', value:'tensions musculaires, douleurs corporelles ; troubles du sommeil, fatigue chronique ; être hypertendu ; troubles digestifs ; difficultés de concentration ; isolement social ; pensées intrusives, flash-back…', list:true },
+      { type:'text',  label:'Bonne nouvelle', value:'Bonne nouvelle 😊 ! Vous êtes prêt à ce que ça change maintenant.' },
+  ]},
+  { id:'deroulement', label:'Déroulement', icon:'🧭', blocks:[
+      { type:'title', label:'Titre', value:'Déroulement d\'une séance et mes outils thérapeutiques' },
+      { type:'text',  label:'Ce que les séances intègrent', value:'une exploration émotionnelle ; une analyse cognitive ; des outils pratiques ; une intégration cérébrale (avec l\'hypnose ou des stimulations bilatérales comme en EMDR).', list:true },
+      { type:'text',  label:'Ma démarche', value:'Je crée un lien de confiance authentique avec vous afin que vous vous sentiez à l\'aise, reconnu, entendu et compris…' },
+      { type:'image', label:'Schéma des outils thérapeutiques', src:'images/schema-outils-therapeutiques.png', file:'schema-outils-therapeutiques.png' },
+  ]},
+  { id:'approche', label:'Mon approche', icon:'🌱', blocks:[
+      { type:'title', label:'Titre', value:'Mon approche et parcours' },
+      { type:'text',  label:'Mon parcours', value:'En parallèle de ma carrière d\'enseignante scientifique, je me suis formée à différentes thérapies dès 2009 : soins énergétiques, kinésiologie, hypnose et en dernier lieu la thérapie MOSAIC…' },
+      { type:'text',  label:'Invitation', value:'Donc si vous vous sentez prêt pour vivre ce changement de vie, je me ferais un plaisir de vous accompagner sur votre nouveau chemin d\'évolution ou de guérison.' },
+      { type:'image', label:'Image de synthèse', src:'images/Affiche-therapie-holistique-pastel.png', file:'affiche-therapie-holistique-pastel.png' },
+  ]},
+  { id:'tarifs', label:'Tarifs', icon:'💶', blocks:[
+      { type:'title', label:'Titre', value:'Mes accompagnements et tarifs' },
+      { type:'text',  label:'Présentation', value:'Mes formations, mes connaissances ou mon expérience personnelle me permettent d\'utiliser de très nombreux outils que j\'adapte au cours des séances…' },
+      { type:'text',  label:'Liste des tarifs', value:'1re séance de découverte à 25 € ; séances suivantes à 50 € ; tarif JEUNE (moins de 30 ans) : 30 € ; je ne prends pas la carte bleue ; merci de me prévenir pour tout report ou annulation ; les séances ne sont pas remboursées par la sécurité sociale ou les mutuelles.', list:true },
+      { type:'text',  label:'Avertissement', value:'Attention : mes accompagnements ne se substituent pas à un suivi médical si besoin ou à un traitement médical en cours.' },
+  ]},
+  { id:'activites', label:'Actualités', icon:'📰', blocks:[
+      { type:'title', label:'Titre', value:'Actualités' },
+      { type:'text',  label:'Contenu', value:'Pour le moment, pas d\'atelier ou d\'événements à venir.' },
+  ]},
+  { id:'contact', label:'Contact', icon:'✉️', blocks:[
+      { type:'title', label:'Titre', value:'Contact et prise de RDV' },
+      { type:'text',  label:'Coordonnées', value:'Pierrette Tréguier — 06 85 45 21 62' },
+      { type:'text',  label:'Consignes de message', value:'Veuillez laisser un message en précisant que vous souhaitez un RDV et en précisant votre nom, votre numéro de téléphone ainsi que vos disponibilités…' },
+      { type:'text',  label:'Lieu des séances', value:'Les séances ont lieu en semaine (pas le samedi), en présentiel à Castelnau-le-Lez (à côté de l\'arrêt du tram Aube Rouge, ligne 2) ou en visio. Il est possible de se garer devant chez moi.' },
+  ]},
+];
+
+let current = 'accueil', dirty = 0;
+
+function buildNav(){
+  document.getElementById('navList').innerHTML = PAGES.map(p =>
+    `<li><button data-p="${p.id}" onclick="showPage('${p.id}')">${p.icon} ${p.label}</button></li>`).join('');
+}
+
+function showPage(id){
+  current = id; dirty = 0; updateSaveInfo();
+  document.querySelectorAll('#navList button, #seoBtn').forEach(b => b.classList.remove('active'));
+  const c = document.getElementById('content');
+  if (id === 'seo') {
+    document.getElementById('seoBtn').classList.add('active');
+    c.innerHTML = `
+      <h2>SEO &amp; référencement</h2>
+      <p class="page-sub">Ces informations sont visibles par Google, pas par les visiteurs.</p>
+      <div class="block">
+        <div class="seo-row"><label>Titre de la page (affiché dans Google)</label>
+          <input type="text" value="Happy-thérapie-holistique avec Pierrette Tréguier : thérapie brève MOSAIC, hypnose ericksonienne et coaching holistique à Castelnau-le-Lez et en visio.">
+          <small>60 caractères recommandés</small></div>
+        <div class="seo-row"><label>Description (résumé sous le titre dans Google)</label>
+          <textarea rows="3">Thérapie brève MOSAIC, hypnose ericksonienne et coaching holistique à Castelnau-le-Lez et en visio. Retrouvez sérénité et joie de vivre.</textarea>
+          <small>155 caractères recommandés</small></div>
+        <div class="seo-row"><label>Mots-clés</label>
+          <input type="text" value="thérapie brève, EMDR, MOSAIC, Hypnose, Holistique, Castelnau-le-Lez, Tréguier Pierrette"></div>
+      </div>`;
+  } else {
+    const p = PAGES.find(x => x.id === id);
+    document.querySelector(`#navList button[data-p="${id}"]`).classList.add('active');
+    c.innerHTML = `
+      <h2>Page « ${p.label} »</h2>
+      <p class="page-sub">Modifiez directement les textes ci-dessous. Tout est cliquable : cliquez sur un élément pour l'éditer.</p>
+      ${p.blocks.map((b,i)=>renderBlock(b,i)).join('')}
+      <div class="add-blocks">
+        <button onclick="addBlock('text')">＋ Ajouter un texte</button>
+        <button onclick="addBlock('image')">＋ Ajouter une image</button>
+      </div>`;
+  }
+}
+
+function renderBlock(b, i){
+  if (b.type === 'title') return `
+    <div class="block" data-i="${i}">
+      <div class="block-head"><span class="block-label">Titre</span></div>
+      <input type="text" value="${b.value}" oninput="markDirty()">
+    </div>`;
+  if (b.type === 'image') return `
+    <div class="block" data-i="${i}">
+      <div class="block-head"><span class="block-label">Image</span>
+        <button class="block-del" onclick="delBlock(${i})">✕ Supprimer ce bloc</button></div>
+      <div class="img-preview"><img src="${b.src}" alt="${b.label}"></div>
+      <div class="img-actions">
+        <button class="btn-ghost" onclick="replaceImage(this)">📁 Remplacer l'image…</button>
+        <span class="file-note">${b.file}</span>
+        <input type="file" accept="image/*" hidden onchange="picked(this)">
+      </div>
+    </div>`;
+  /* texte riche */
+  const items = b.list ? b.value.split(' ; ').map(x => `<li>${x.trim()}</li>`).join('') : `<p>${b.value}</p>`;
+  return `
+    <div class="block" data-i="${i}">
+      <div class="block-head"><span class="block-label">${b.label}</span>
+        <button class="block-del" onclick="delBlock(${i})">✕ Supprimer ce bloc</button></div>
+      <div class="toolbar">
+        <button title="Gras" onmousedown="event.preventDefault()" onclick="cmd('bold')"><b>B</b></button>
+        <button title="Italique" onmousedown="event.preventDefault()" onclick="cmd('italic')"><i>I</i></button>
+        <button title="Souligné" onmousedown="event.preventDefault()" onclick="cmd('underline')"><u>U</u></button>
+        <button title="Liste à puces" onmousedown="event.preventDefault()" onclick="cmd('insertUnorderedList')">•</button>
+      </div>
+      <div class="rich" contenteditable="true" oninput="markDirty()" ${b.list ? 'data-list="1"' : ''}>${b.list ? '<ul>'+items+'</ul>' : items}</div>
+    </div>`;
+}
+
+function cmd(name){ document.execCommand(name); }
+function markDirty(){ dirty++; updateSaveInfo(); }
+function updateSaveInfo(){
+  const el = document.getElementById('saveInfo');
+  el.textContent = dirty ? `${dirty} modification${dirty>1?'s':''} non enregistrée${dirty>1?'s':''}` : 'Aucune modification';
+  el.className = dirty ? 'dirty' : 'clean';
+}
+function addBlock(type){
+  const p = PAGES.find(x => x.id === current);
+  const i = p.blocks.length;
+  p.blocks.push(type === 'text'
+    ? { type:'text', label:'Nouveau texte', value:'Votre texte ici…' }
+    : { type:'image', label:'Nouvelle image', src:'', file:'(aucune image)' });
+  showPage(current);
+  const last = document.querySelectorAll('#content .block')[i];
+  if (last) last.scrollIntoView({ behavior:'smooth', block:'center' });
+  toast('Bloc ajouté (maquette).');
+}
+function delBlock(i){
+  PAGES.find(x => x.id === current).blocks.splice(i, 1);
+  showPage(current);
+  toast('Bloc supprimé (maquette).');
+}
+function replaceImage(btn){ btn.parentElement.querySelector('input[type=file]').click(); }
+function picked(inp){
+  if (!inp.files[0]) return;
+  const card = inp.closest('.block');
+  card.querySelector('.img-preview').innerHTML = `<img src="${URL.createObjectURL(inp.files[0])}">`;
+  card.querySelector('.file-note').textContent = inp.files[0].name;
+  markDirty();
+  toast('Image sélectionnée : ' + inp.files[0].name + ' (maquette).');
+}
+function save(){
+  toast('✓ Enregistré sur le site (dans cette maquette, c\'est fictif)', 'ok');
+  dirty = 0; updateSaveInfo();
+}
+let toastTimer;
+function toast(msg, cls){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast show ' + (cls || '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.className = 'toast', 2600);
+}
+function login(){ document.getElementById('view-login').hidden = true; document.getElementById('view-admin').hidden = false; showPage('accueil'); }
+function logout(){ document.getElementById('view-admin').hidden = true; document.getElementById('view-login').hidden = false; document.getElementById('pwd').value = ''; }
+
+buildNav();
+document.getElementById('pwd').addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
+</script>
+</body>
+</html>
