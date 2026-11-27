@@ -66,9 +66,9 @@ const admin = {
     }
     
     // ⚠️ NOUVEAU : Vérification email administrateur
-    const ADMIN_EMAIL = 'tp34@free.fr';
+    const ADMIN_EMAIL = 'fbaranes@gmail.com';
     if (email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
-      admin.toast('Accès administrateur réservé à tp34@free.fr');
+      admin.toast('Accès administrateur réservé à fbaranes@gmail.com');
       return;
     }
 
