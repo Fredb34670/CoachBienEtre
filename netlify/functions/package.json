@@ -1,9 +1,9 @@
 {
-  "name": "netlify-functions",
+  "name": "site-functions",
   "version": "1.0.0",
   "private": true,
-  "description": "Dépendances des Netlify Functions (installées automatiquement au déploiement)",
+  "description": "Dépendances des Netlify Functions du site (installées automatiquement au déploiement)",
   "dependencies": {
-    "@netlify/blobs": "^2.0.0"
+    "@netlify/blobs": "^2.5.0"
   }
 }
