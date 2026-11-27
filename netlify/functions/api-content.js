@@ -136,7 +136,7 @@ async function getAllSectionsLocal() {
 
 async function saveContent(body) {
   try {
-    const store = await getDeployStore();
+    const store = await getDeployStore({ region: "auto" });
     await store.set(CONTENT_BLOB_KEY, JSON.stringify({
       ...body,
       updated: new Date().toISOString()
