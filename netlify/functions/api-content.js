@@ -78,7 +78,7 @@ exports.handler = async (event, context) => {
 
 async function getContent() {
   try {
-    const store = await getDeployStore();
+    const store = await getDeployStore({ region: "auto" });
     const blob = await store.get(CONTENT_BLOB_KEY);
 
     if (blob) {
