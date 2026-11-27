@@ -6,7 +6,7 @@
  */
 
 const crypto = require('crypto');
-const { getDeployStore } = require('@netlify/blobs');
+const { connectLambda, getDeployStore } = require('@netlify/blobs');
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -28,6 +28,16 @@ exports.handler = async (event, context) => {
   }
 
   try {
+    // Configure le client Blobs à partir de l'événement (le runtime Netlify
+    // injecte le jeton de service dans event.blobs) — nécessaire pour
+    // getDeployStore() sur le runtime de fonctions récent.
+    try {
+      connectLambda(event);
+    } catch (e) {
+      // Si event.blobs est absent (runtime ancien), le fallback JSON local
+      // de getContent() / l'erreur de saveContent() prend le relais.
+    }
+
     const authHeader = event.headers.Authorization || event.headers.authorization || '';
     const token = authHeader.replace('Bearer ', '');
 
