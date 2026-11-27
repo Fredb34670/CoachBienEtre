@@ -32,7 +32,7 @@ async function getStore() {
       // l'écriture ET la lecture fonctionnent réellement
       await store.set('__region_probe__', 'ok');
       const probe = await store.get('__region_probe__');
-      if (probe && (await probe.text()) === 'ok') {
+      if (probe != null) {
         regionCache = region;
         return store;
       }
@@ -42,6 +42,17 @@ async function getStore() {
   }
   if (lastError) throw lastError;
   throw new Error('Impossible de déterminer une région Netlify Blobs fonctionnelle');
+}
+
+// Lecture robuste d'un blob : selon le runtime, store.get() renvoie un
+// Blob Web, une Buffer ou une Uint8Array
+async function blobToString(blob) {
+  if (blob == null) return null;
+  if (typeof blob.text === 'function') return await blob.text();
+  if (typeof blob === 'string') return blob;
+  if (Buffer.isBuffer(blob)) return blob.toString('utf8');
+  if (blob instanceof Uint8Array) return Buffer.from(blob).toString('utf8');
+  return JSON.stringify(blob);
 }
 
 // Clé de signature des jetons de session admin (jamais présente dans le code public :
@@ -111,7 +122,7 @@ async function getContent() {
     const blob = await store.get(CONTENT_BLOB_KEY);
 
     if (blob) {
-      const stored = JSON.parse(await blob.text());
+      const stored = JSON.parse(await blobToString(blob));
 
       // Merge : données stockées + fichiers locaux par défaut
       const localDefaults = {
