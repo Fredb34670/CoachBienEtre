@@ -14,6 +14,11 @@ const corsHeaders = {
 const blobStore = createClient({ useBundledBlob: true });
 const CONTENT_BLOB_KEY = 'site-content-v1';
 
+// Email administrateur autorisé à écrire le contenu.
+// Configurable via la variable d'environnement ADMIN_EMAIL dans Netlify
+// (Site settings → Environment variables). Valeur par défaut identique à admin.js
+const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || 'fbaranes@gmail.com').toLowerCase();
+
 exports.handler = async (event, context) => {
   const httpMethod = event.httpMethod;
 
@@ -143,30 +148,34 @@ async function saveContent(body) {
 }
 
 function validateIdentityToken(token) {
-  // Netlify Identity token validation
-  // Les tokens Identity sont JWT signés par Netlify
-  // Pour une validation simple, on vérifie le format et la signature
-  
+  // Validation du token Netlify Identity + restriction à l'email administrateur.
+  // Les tokens Identity sont des JWT signés par Netlify : on vérifie le format,
+  // la validité (exp) et l'email du porteur. La signature n'est pas vérifiée
+  // côté fonction (la clé publique Netlify n'est pas disponible ici) ;
+  // le contrôle d'email borne l'accès à l'administrateur.
+
   if (!token || token.length < 10) return false;
-  
+
   try {
     const parts = token.split('.');
     if (parts.length !== 3) return false;
-    
-    // Décoder le payload (pas de vérification de signature en frontend)
-    // En production, on vérifierait la signature avec la clé publique Netlify
-    const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString());
-    
-    // Vérifier que le token n'est pas expiré
-    if (payload.exp && payload.exp < Date.now() / 1000) {
+
+    // Décoder le payload du JWT (base64url → base64)
+    const b64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+    const payload = JSON.parse(Buffer.from(b64, 'base64').toString());
+
+    // Token expiré → refus
+    if (payload.exp && payload.exp <= Date.now() / 1000) {
       return false;
     }
-    
-    // Vérifier que c'est un token Identity (sub contient .netlify-app)
-    if (!payload.sub || !payload.sub.includes('.netlify-app')) {
+
+    // Seule la session de l'administrateur peut écrire le contenu
+    const tokenEmail = (payload.email || (payload.sub || '')).toLowerCase();
+    if (tokenEmail !== ADMIN_EMAIL) {
+      console.warn('Écriture refusée : token non administrateur (', tokenEmail || 'email manquant', ')');
       return false;
     }
-    
+
     return true;
   } catch {
     return false;

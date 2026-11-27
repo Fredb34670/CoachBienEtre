@@ -2,6 +2,9 @@
 
 const PAGES = ['accueil', 'pourqui', 'deroulement', 'approche', 'tarifs', 'activites', 'contact'];
 
+// Email administrateur autorisé (seul accès au panneau)
+const ADMIN_EMAIL = 'fbaranes@gmail.com';
+
 let current = 'accueil';
 let data = { blocks: [] };
 let dirty = 0;
@@ -15,22 +18,40 @@ const admin = {
   checkAuth() {
     // Netlify Identity check
     if (typeof netlifyIdentity !== 'undefined') {
+      const isAllowed = (user) =>
+        user && user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+
       netlifyIdentity.on('login', (user) => {
-        this.onLogin(user);
+        if (isAllowed(user)) {
+          this.onLogin(user);
+        } else {
+          // Session ouverte pour un autre compte → on la ferme
+          this.toast('Accès réservé à l\'administrateur');
+          netlifyIdentity.logout();
+          this.showLogin();
+        }
       });
       netlifyIdentity.on('logout', () => {
         this.onLogout();
       });
-      
+
       const currentUser = netlifyIdentity.currentUser();
       if (currentUser && currentUser.loggedIn) {
-        this.onLogin(currentUser);
+        if (isAllowed(currentUser)) {
+          this.onLogin(currentUser);
+        } else {
+          // Session existante non autorisée → déconnexion forcée
+          this.toast('Session non autorisée : déconnecté');
+          netlifyIdentity.logout();
+          this.showLogin();
+        }
       } else {
         this.showLogin();
       }
     } else {
       console.error('Netlify Identity not loaded');
       this.toast('Erreur: Identity non chargé');
+      this.showLogin();
     }
   },
 
@@ -65,10 +86,9 @@ const admin = {
       return;
     }
     
-    // ⚠️ NOUVEAU : Vérification email administrateur
-    const ADMIN_EMAIL = 'fbaranes@gmail.com';
+    // Vérification email administrateur (constante globale)
     if (email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
-      admin.toast('Accès administrateur réservé à fbaranes@gmail.com');
+      admin.toast('Accès administrateur réservé à ' + ADMIN_EMAIL);
       return;
     }
 
@@ -244,7 +264,12 @@ const admin = {
         if (res.token) localStorage.setItem('adminToken', res.token);
         admin.toast('✓ Sauvegardé');
         dirty = 0; admin.updateSaveInfo();
-      } else { 
+      } else if (r.status === 401 || r.status === 403) {
+        // Session expirée ou compte non autorisé → reconnexion requise
+        localStorage.removeItem('adminToken');
+        admin.toast('Session expirée ou non autorisée : reconnectez-vous');
+        netlifyIdentity.logout();
+      } else {
         const err = await r.json().catch(() => ({}));
         admin.toast('Erreur: ' + (err.error || 'serveur')); 
       }
