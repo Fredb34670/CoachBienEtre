@@ -111,7 +111,18 @@ const admin = {
   async loadContent(page) {
     try {
       const r = await fetch(`../content/${page}.json`);
-      if (r.ok) return await r.json();
+      if (r.ok) {
+        const json = await r.json();
+        // Forme actuelle du panneau : { blocks: [...] }
+        if (json && Array.isArray(json.blocks)) return json;
+        // Ancienne forme des fichiers content/*.json : { title, hero_image, hero_intro, details, content... }
+        // On la convertit en blocs pour que le panneau reste utilisable.
+        const blocks = [];
+        if (json.title) blocks.push({ type: 'title', label: 'Titre', value: json.title });
+        const body = json.details || json.content || json.hero_intro || '';
+        blocks.push({ type: 'text', label: 'Texte', value: body });
+        return { blocks };
+      }
     } catch {}
     // Fallback default
     return { blocks: [
