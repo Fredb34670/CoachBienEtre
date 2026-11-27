@@ -1,22 +1,22 @@
 /**
  * Netlify Function: api-content
  * Récupère ou sauvegarde le contenu dynamique du site.
- * Utilise Netlify Blob pour le stockage persistant (gratuit jusqu'à 5 Mo)
+ * Utilise le stockage Bundled Blob gratuit de Netlify (5 Mo, inclus au plan gratuit)
+ * via l'API @netlify/blobs v11 : getDeployStore().
  */
 
 const crypto = require('crypto');
-const { createClient } = require('@netlify/blobs');
+const { getDeployStore } = require('@netlify/blobs');
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 };
 
-const blobStore = createClient({ useBundledBlob: true });
 const CONTENT_BLOB_KEY = 'site-content-v1';
 
-// Le jeton d'écriture est le jeton de session admin émis par la fonction /login,
-// signé avec la variable d'environnement JWT_SECRET. La lecture (GET) reste publique.
+// Clé de signature des jetons de session admin (jamais présente dans le code public :
+// elle est définie comme variable d'environnement dans le dashboard Netlify)
 const JWT_SECRET = process.env.JWT_SECRET;
 
 exports.handler = async (event, context) => {
@@ -31,7 +31,7 @@ exports.handler = async (event, context) => {
     const authHeader = event.headers.Authorization || event.headers.authorization || '';
     const token = authHeader.replace('Bearer ', '');
 
-    // Authentification nécessaire pour POST
+    // L'écriture (POST) exige le jeton de session administrateur
     if (httpMethod === 'POST') {
       if (!validateAdminToken(token)) {
         return {
@@ -68,10 +68,13 @@ exports.handler = async (event, context) => {
 
 async function getContent() {
   try {
-    const stored = await blobStore.get(CONTENT_BLOB_KEY, { type: 'json' });
-    
-    if (stored && stored.data) {
-      // Merge: données stockées + fichiers locaux par défaut
+    const store = await getDeployStore();
+    const blob = await store.get(CONTENT_BLOB_KEY);
+
+    if (blob) {
+      const stored = JSON.parse(await blob.text());
+
+      // Merge : données stockées + fichiers locaux par défaut
       const localDefaults = {
         accueil: await loadLocalJson('accueil.json'),
         pourqui: await loadLocalJson('pourqui.json'),
@@ -82,8 +85,8 @@ async function getContent() {
         contact: await loadLocalJson('contact.json')
       };
 
-      // Combiner: contenu stocké prend le dessus
-      const merged = { ...localDefaults, ...stored.data };
+      // Le contenu stocké prend le dessus sur les valeurs locales
+      const merged = { ...localDefaults, ...stored };
       return {
         statusCode: 200,
         headers: corsHeaders,
@@ -92,7 +95,7 @@ async function getContent() {
     }
   } catch (e) { /* fall through */ }
 
-  // Fallback: charger les fichiers locaux
+  // Fallback : charger les fichiers locaux
   return getAllSectionsLocal();
 }
 
@@ -123,17 +126,17 @@ async function getAllSectionsLocal() {
 
 async function saveContent(body) {
   try {
-    // Sauvegarder dans le blob
-    await blobStore.set(CONTENT_BLOB_KEY, {
-      data: body,
+    const store = await getDeployStore();
+    await store.set(CONTENT_BLOB_KEY, JSON.stringify({
+      ...body,
       updated: new Date().toISOString()
-    });
+    }));
 
     return {
       statusCode: 200,
       headers: corsHeaders,
-      body: JSON.stringify({ 
-        success: true, 
+      body: JSON.stringify({
+        success: true,
         message: 'Contenu sauvegardé',
         updated: new Date().toISOString()
       })
