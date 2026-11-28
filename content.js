@@ -33,7 +33,36 @@ function renderSection(section, data) {
   const panel = document.getElementById(SECTION_IDS[section]);
   if (!panel) return;
 
-  // Gestion spéciale pour la section accueil (structure héro + details)
+  // Si la section contient des blocks (format sauvegardé par l'admin)
+  if (data && Array.isArray(data.blocks)) {
+    // Vider le panneau
+    panel.innerHTML = '';
+    data.blocks.forEach(block => {
+      if (block.type === 'title') {
+        const h2 = document.createElement('h2');
+        h2.textContent = block.value || '';
+        panel.appendChild(h2);
+      } else if (block.type === 'text') {
+        const div = document.createElement('div');
+        div.className = 'block-text-content';
+        div.innerHTML = block.value || '';
+        panel.appendChild(div);
+      } else if (block.type === 'image' && (block.src || block.file)) {
+        const div = document.createElement('div');
+        div.className = 'block-image-content';
+        const img = document.createElement('img');
+        img.src = block.src || `images/${block.file}`;
+        img.alt = block.label || 'Image';
+        img.style.maxWidth = '100%';
+        img.style.height = 'auto';
+        div.appendChild(img);
+        panel.appendChild(div);
+      }
+    });
+    return;
+  }
+
+  // Gestion spéciale pour la section accueil (structure héro + details d'origine)
   if (section === 'accueil') {
     // Mettre à jour le titre de la section (h2)
     const h2 = panel.querySelector('h2');
