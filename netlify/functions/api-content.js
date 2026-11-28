@@ -11,7 +11,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 };
 
-const GITHUB_REPO = 'Fredb34670/CoachBienEtre';
+const GITHUB_REPO = 'Fredb34670/happy-therapie-holistique';
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const JWT_SECRET = process.env.JWT_SECRET;
 
