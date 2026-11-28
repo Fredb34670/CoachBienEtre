@@ -242,48 +242,47 @@ const admin = {
       return;
     }
 
-    admin.toast('Enregistrement en cours...');
-
     try {
-      // Formater les blocs pour le site
+      // 1. On prépare les données au format attendu par le site
       const sectionData = {};
       const titleBlock = data.blocks.find(b => b.type === 'title');
-      const textBlock = data.blocks.find(b => b.type === 'text');
+      const textBlocks = data.blocks.filter(b => b.type === 'text');
+      const imgBlock = data.blocks.find(b => b.type === 'image');
 
       if (titleBlock) sectionData.title = titleBlock.value;
-      if (textBlock) {
-        if (current === 'accueil') {
-          sectionData.hero_intro = textBlock.value;
-          sectionData.details = textBlock.value;
-        } else {
-          sectionData.content = textBlock.value;
-        }
-      }
+      
+      // On conserve la structure par blocs pour l'admin
       sectionData.blocks = data.blocks;
 
-      const r = await fetch(API_CONTENT, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ page: current, content: sectionData })
-      });
-
-      if (r.ok) {
-        admin.toast('✓ Sauvegardé en ligne avec succès !');
-        dirty = 0;
-        admin.updateSaveInfo();
-      } else if (r.status === 401 || r.status === 403) {
-        localStorage.removeItem(TOKEN_KEY);
-        admin.toast('Session expirée : reconnectez-vous');
-        admin.logout();
+      // Compatibilité avec l'ancien format pour le site public
+      const mainText = textBlocks.length > 0 ? textBlocks[0].value : '';
+      if (current === 'accueil') {
+        sectionData.hero_intro = mainText;
+        sectionData.details = mainText;
+        if (imgBlock) sectionData.hero_image = imgBlock.file || imgBlock.src;
       } else {
-        const err = await r.json().catch(() => ({}));
-        admin.toast('Erreur: ' + (err.error || 'serveur'));
+        sectionData.content = mainText;
       }
+
+      // 2. Génération et téléchargement du fichier
+      const blob = new Blob([JSON.stringify(sectionData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${current}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      admin.toast(`✓ Fichier ${current}.json prêt dans vos téléchargements !`);
+      admin.toast('Glissez-le dans le dossier content/ de votre projet.', 'ok');
+      
+      dirty = 0;
+      admin.updateSaveInfo();
     } catch (e) {
-      admin.toast('Erreur réseau');
+      console.error(e);
+      admin.toast('Erreur lors de la création du fichier');
     }
   },
 
