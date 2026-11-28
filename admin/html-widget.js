@@ -12,6 +12,12 @@
 
   var HtmlControl = createClass({
     componentDidMount: function () {
+      // Les nouvelles lignes créées avec Entrée seront des paragraphes <p> (comme sur le site).
+      try {
+        document.execCommand('defaultParagraphSeparator', false, 'p');
+      } catch (e) {
+        /* certains navigateurs ne supportent pas cette commande */
+      }
       this.syncFromProps();
     },
 
@@ -24,14 +30,14 @@
     },
 
     syncFromProps: function () {
-      var el = this.refs.editor;
+      var el = this.editor;
       if (!el) return;
       var html = this.props.value == null ? '' : String(this.props.value);
       if (el.innerHTML !== html) el.innerHTML = html;
     },
 
     exec: function (command, arg) {
-      var el = this.refs.editor;
+      var el = this.editor;
       if (!el) return;
       el.focus();
       try {
@@ -43,7 +49,7 @@
     },
 
     emit: function () {
-      var el = this.refs.editor;
+      var el = this.editor;
       if (!el) return;
       this.lastEmitted = el.innerHTML;
       this.props.onChange(this.lastEmitted);
@@ -55,7 +61,7 @@
 
     // Met le texte sélectionné en violet avec la classe exacte du site.
     wrapViolet: function () {
-      var el = this.refs.editor;
+      var el = this.editor;
       if (!el) return;
       el.focus();
       var sel = window.getSelection();
@@ -159,7 +165,9 @@
           )
         ),
         h('div', {
-          ref: 'editor',
+          ref: function (el) {
+            self.editor = el;
+          },
           contentEditable: true,
           suppressContentEditableWarning: true,
           className: 'html-widget-editor',
