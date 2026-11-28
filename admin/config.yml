@@ -6,12 +6,57 @@ media_folder: "images"
 public_folder: "images"
 
 collections:
-  - name: "content"
-    label: "Contenu des pages"
-    folder: "content"
-    create: false
-    slug: "{{slug}}"
-    fields:
-      - { label: "Titre", name: "title", widget: "string" }
-      - { label: "Contenu", name: "content", widget: "markdown" }
-      - { label: "Image principale", name: "hero_image", widget: "image", required: false }
+  - name: "pages"
+    label: "Pages du site"
+    files:
+      - file: "content/accueil.json"
+        label: "Page Accueil"
+        name: "accueil"
+        fields:
+          - { label: "Titre principal", name: "title", widget: "string" }
+          - { label: "Image du héros", name: "hero_image", widget: "image" }
+          - { label: "Introduction (Héros)", name: "hero_intro", widget: "markdown" }
+          - { label: "Détails de l'accueil", name: "details", widget: "markdown" }
+
+      - file: "content/pourqui.json"
+        label: "Page Pour qui"
+        name: "pourqui"
+        fields:
+          - { label: "Titre", name: "title", widget: "string" }
+          - { label: "Contenu", name: "content", widget: "markdown" }
+
+      - file: "content/deroulement.json"
+        label: "Page Déroulement"
+        name: "deroulement"
+        fields:
+          - { label: "Titre", name: "title", widget: "string" }
+          - { label: "Contenu", name: "content", widget: "markdown" }
+
+      - file: "content/approche.json"
+        label: "Page Mon approche"
+        name: "approche"
+        fields:
+          - { label: "Titre", name: "title", widget: "string" }
+          - { label: "Contenu", name: "content", widget: "markdown" }
+          - { label: "Image illustrative", name: "hero_image", widget: "image", required: false }
+
+      - file: "content/tarifs.json"
+        label: "Page Tarifs"
+        name: "tarifs"
+        fields:
+          - { label: "Titre", name: "title", widget: "string" }
+          - { label: "Contenu des tarifs", name: "content", widget: "markdown" }
+
+      - file: "content/activites.json"
+        label: "Page Actualités"
+        name: "activites"
+        fields:
+          - { label: "Titre", name: "title", widget: "string" }
+          - { label: "Contenu des actus", name: "content", widget: "markdown" }
+
+      - file: "content/contact.json"
+        label: "Page Contact"
+        name: "contact"
+        fields:
+          - { label: "Titre", name: "title", widget: "string" }
+          - { label: "Coordonnées", name: "content", widget: "markdown" }
