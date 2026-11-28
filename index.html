@@ -7,20 +7,7 @@
   <meta name="keywords" content="thérapie brève, EMDR, MOSAIC, Hypnose, Holistique, Castelnau le lez, TREGUIER Pierrette">
   <title id="meta-title">Happy-thérapie-holistique - Pierrette Tréguier</title>
   <link rel="stylesheet" href="style.css">
-
-  <!-- Netlify Identity : les liens des mails (reset du mot de passe, confirmation d'invite)
-       déposent un jeton dans la hash de l'URL (#recovery_token=..., #confirmation_token=...).
-       Le widget Identity, qui traite ces jetons, n'est chargé que sur /admin/ :
-       on y redirige donc pour que le formulaire de récupération s'affiche.
-       Aucune incidence sur la navigation normale (aucun jeton dans la hash). -->
-  <script>
-    (function () {
-      var hash = window.location.hash || '';
-      if (/(recovery|confirmation|invite|email_change)_token=/.test(hash)) {
-        window.location.replace('/admin/' + hash);
-      }
-    })();
-  </script>
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 <body>
   <div class="binder">
@@ -177,6 +164,5 @@
   </div>
 
   <script src="script.js"></script>
-  <script src="content.js"></script>
 </body>
 </html>
