@@ -283,7 +283,9 @@ const admin = {
 function tokenAlive(token) {
   try {
     const payloadB64 = String(token).split('.')[0];
-    const payload = JSON.parse(Buffer.from(payloadB64.replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString());
+    const b64 = payloadB64.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonStr = decodeURIComponent(atob(b64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+    const payload = JSON.parse(jsonStr);
     return typeof payload.exp === 'number' && payload.exp > Date.now();
   } catch {
     return false;
