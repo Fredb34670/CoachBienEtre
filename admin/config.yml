@@ -7,7 +7,7 @@ locale: fr
 
 # Les images ajoutées depuis l'administration sont enregistrées dans /images
 media_folder: "images"
-public_folder: "images"
+public_folder: "/images"
 
 collections:
   - name: "pages"
@@ -21,29 +21,29 @@ collections:
         fields:
           - { label: "Titre principal", name: "title", widget: "string" }
           - { label: "Photo de présentation", name: "hero_image", widget: "image", required: false }
-          - { label: "Introduction (sous le titre)", name: "hero_intro", widget: "markdown" }
-          - { label: "Texte de présentation", name: "details", widget: "markdown" }
+          - { label: "Introduction (sous le titre)", name: "hero_intro", widget: "html" }
+          - { label: "Texte de présentation", name: "details", widget: "html" }
 
       - name: "pourqui"
         label: "Pour qui"
         file: "content/pourqui.json"
         fields:
           - { label: "Titre", name: "title", widget: "string" }
-          - { label: "Contenu", name: "content", widget: "markdown" }
+          - { label: "Contenu", name: "content", widget: "html" }
 
       - name: "deroulement"
         label: "Déroulement"
         file: "content/deroulement.json"
         fields:
           - { label: "Titre", name: "title", widget: "string" }
-          - { label: "Contenu", name: "content", widget: "markdown" }
+          - { label: "Contenu", name: "content", widget: "html" }
 
       - name: "approche"
         label: "Mon approche"
         file: "content/approche.json"
         fields:
           - { label: "Titre", name: "title", widget: "string" }
-          - { label: "Contenu", name: "content", widget: "markdown" }
+          - { label: "Contenu", name: "content", widget: "html" }
           - { label: "Image d'illustration", name: "hero_image", widget: "image", required: false }
 
       - name: "tarifs"
@@ -51,21 +51,21 @@ collections:
         file: "content/tarifs.json"
         fields:
           - { label: "Titre", name: "title", widget: "string" }
-          - { label: "Contenu", name: "content", widget: "markdown" }
+          - { label: "Contenu", name: "content", widget: "html" }
 
       - name: "activites"
         label: "Actualités"
         file: "content/activites.json"
         fields:
           - { label: "Titre", name: "title", widget: "string" }
-          - { label: "Contenu", name: "content", widget: "markdown" }
+          - { label: "Contenu", name: "content", widget: "html" }
 
       - name: "contact"
         label: "Contact"
         file: "content/contact.json"
         fields:
           - { label: "Titre", name: "title", widget: "string" }
-          - { label: "Contenu", name: "content", widget: "markdown" }
+          - { label: "Contenu", name: "content", widget: "html" }
 
   - name: "reglages"
     label: "Réglages du site"

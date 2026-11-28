@@ -23,6 +23,13 @@
     });
   }
 
+  function imgSrc(value) {
+    if (!value) return '';
+    if (/^(https?:)?\/\//.test(value) || value.charAt(0) === '/') return value;
+    if (value.indexOf('images/') === 0) return value;
+    return 'images/' + value;
+  }
+
   function htmlToNodes(html) {
     var box = document.createElement('div');
     box.innerHTML = html || '';
@@ -57,7 +64,7 @@
         var wrap = document.createElement('div');
         wrap.className = 'block-image-content';
         var img = document.createElement('img');
-        img.src = block.src || 'images/' + block.file;
+        img.src = imgSrc(block.src || block.file);
         img.alt = block.label || '';
         img.style.maxWidth = '100%';
         img.style.height = 'auto';
@@ -73,7 +80,7 @@
 
     var photo = panel.querySelector('.accueil-photo img');
     if (photo && data.hero_image) {
-      photo.src = 'images/' + data.hero_image;
+      photo.src = imgSrc(data.hero_image);
     }
 
     var intro = panel.querySelector('.accueil-text');
@@ -91,6 +98,37 @@
     if (details && data.details) details.innerHTML = data.details;
   }
 
+  // Remet les classes de style du site si elles ont été perdues lors d'une édition.
+  function decorate(section, panel) {
+    if (section === 'deroulement') {
+      Array.prototype.forEach.call(panel.querySelectorAll('h3'), function (el) {
+        el.classList.add('titre-violet');
+        el.classList.add('titre-violet-normal');
+      });
+      Array.prototype.forEach.call(panel.querySelectorAll('h4'), function (el) {
+        el.classList.add('titre-violet');
+      });
+    }
+
+    if (section === 'pourqui') {
+      Array.prototype.forEach.call(panel.querySelectorAll('p'), function (el) {
+        if (/^\s*Bonne nouvelle/i.test(el.textContent)) el.classList.add('bonne-nouvelle');
+      });
+    }
+
+    if (section === 'approche') {
+      Array.prototype.forEach.call(panel.querySelectorAll('p'), function (el) {
+        if (/^\s*Donc si vous/i.test(el.textContent)) el.classList.add('approche-invitation');
+      });
+    }
+
+    if (section === 'tarifs') {
+      Array.prototype.forEach.call(panel.querySelectorAll('p'), function (el) {
+        if (/^\s*Attention/i.test(el.textContent)) el.classList.add('tarif-avertissement');
+      });
+    }
+  }
+
   function renderSection(section, data) {
     var panel = document.getElementById(SECTIONS[section]);
     if (!panel || !data) return;
@@ -98,11 +136,13 @@
     // Ancien format "blocks" : on continue de le gérer par sécurité.
     if (Array.isArray(data.blocks) && data.blocks.length) {
       renderBlocks(panel, data.blocks);
+      decorate(section, panel);
       return;
     }
 
     if (section === 'accueil') {
       renderAccueil(panel, data);
+      decorate(section, panel);
       return;
     }
 
@@ -118,12 +158,14 @@
       var wrap = document.createElement('div');
       wrap.className = 'approche-image';
       var img = document.createElement('img');
-      img.src = 'images/' + data.hero_image;
+      img.src = imgSrc(data.hero_image);
       img.alt = 'Happy-Thérapie-Holistique';
       img.loading = 'lazy';
       wrap.appendChild(img);
       panel.appendChild(wrap);
     }
+
+    decorate(section, panel);
   }
 
   function loadContent() {

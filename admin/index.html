@@ -3,12 +3,26 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Administration – Happy-Thérapie-Holistique</title>
+  <title>Administration - Happy-Thérapie-Holistique</title>
   <!-- Script Netlify Identity pour l'authentification -->
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <style>
+    /* Rendu lisible à l'intérieur de l'éditeur visuel */
+    .html-widget-editor h2,
+    .html-widget-editor h3,
+    .html-widget-editor h4 { color: #ea39c1; margin: 0.8em 0 0.4em; }
+    .html-widget-editor p { margin: 0 0 0.8em; }
+    .html-widget-editor ul,
+    .html-widget-editor ol { margin: 0 0 0.8em 1.4em; }
+    .html-widget-editor u { text-decoration: underline; }
+    .html-widget-editor .accent-violet { color: #ea39c1; font-weight: 600; }
+    .html-widget-editor .tarifs-grid { display: block; }
+  </style>
 </head>
 <body>
-  <!-- Decap CMS interface -->
+  <!-- Interface Decap CMS -->
   <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+  <!-- Éditeur visuel maison : enregistre le HTML exact du site -->
+  <script src="html-widget.js"></script>
 </body>
 </html>
