@@ -2,61 +2,78 @@ backend:
   name: git-gateway
   branch: main
 
+# Interface en français
+locale: fr
+
+# Les images ajoutées depuis l'administration sont enregistrées dans /images
 media_folder: "images"
 public_folder: "images"
 
 collections:
   - name: "pages"
     label: "Pages du site"
+    label_singular: "Page"
+    description: "Modifiez le texte de chaque page, puis cliquez sur « Publier »."
     files:
-      - file: "content/accueil.json"
-        label: "Page Accueil"
-        name: "accueil"
+      - name: "accueil"
+        label: "Accueil"
+        file: "content/accueil.json"
         fields:
           - { label: "Titre principal", name: "title", widget: "string" }
-          - { label: "Image du héros", name: "hero_image", widget: "image" }
-          - { label: "Introduction (Héros)", name: "hero_intro", widget: "markdown" }
-          - { label: "Détails de l'accueil", name: "details", widget: "markdown" }
+          - { label: "Photo de présentation", name: "hero_image", widget: "image", required: false }
+          - { label: "Introduction (sous le titre)", name: "hero_intro", widget: "markdown" }
+          - { label: "Texte de présentation", name: "details", widget: "markdown" }
 
-      - file: "content/pourqui.json"
-        label: "Page Pour qui"
-        name: "pourqui"
+      - name: "pourqui"
+        label: "Pour qui"
+        file: "content/pourqui.json"
         fields:
           - { label: "Titre", name: "title", widget: "string" }
           - { label: "Contenu", name: "content", widget: "markdown" }
 
-      - file: "content/deroulement.json"
-        label: "Page Déroulement"
-        name: "deroulement"
+      - name: "deroulement"
+        label: "Déroulement"
+        file: "content/deroulement.json"
         fields:
           - { label: "Titre", name: "title", widget: "string" }
           - { label: "Contenu", name: "content", widget: "markdown" }
 
-      - file: "content/approche.json"
-        label: "Page Mon approche"
-        name: "approche"
+      - name: "approche"
+        label: "Mon approche"
+        file: "content/approche.json"
         fields:
           - { label: "Titre", name: "title", widget: "string" }
           - { label: "Contenu", name: "content", widget: "markdown" }
-          - { label: "Image illustrative", name: "hero_image", widget: "image", required: false }
+          - { label: "Image d'illustration", name: "hero_image", widget: "image", required: false }
 
-      - file: "content/tarifs.json"
-        label: "Page Tarifs"
-        name: "tarifs"
+      - name: "tarifs"
+        label: "Tarifs"
+        file: "content/tarifs.json"
         fields:
           - { label: "Titre", name: "title", widget: "string" }
-          - { label: "Contenu des tarifs", name: "content", widget: "markdown" }
+          - { label: "Contenu", name: "content", widget: "markdown" }
 
-      - file: "content/activites.json"
-        label: "Page Actualités"
-        name: "activites"
+      - name: "activites"
+        label: "Actualités"
+        file: "content/activites.json"
         fields:
           - { label: "Titre", name: "title", widget: "string" }
-          - { label: "Contenu des actus", name: "content", widget: "markdown" }
+          - { label: "Contenu", name: "content", widget: "markdown" }
 
-      - file: "content/contact.json"
-        label: "Page Contact"
-        name: "contact"
+      - name: "contact"
+        label: "Contact"
+        file: "content/contact.json"
         fields:
           - { label: "Titre", name: "title", widget: "string" }
-          - { label: "Coordonnées", name: "content", widget: "markdown" }
+          - { label: "Contenu", name: "content", widget: "markdown" }
+
+  - name: "reglages"
+    label: "Réglages du site"
+    files:
+      - name: "meta"
+        label: "Titre et référencement (Google)"
+        file: "content/meta.json"
+        fields:
+          - { label: "Titre de l'onglet du navigateur", name: "title", widget: "string" }
+          - { label: "Description pour Google", name: "description", widget: "text" }
+          - { label: "Mots-clés", name: "keywords", widget: "string" }

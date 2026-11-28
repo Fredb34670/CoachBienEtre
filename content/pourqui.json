@@ -1,14 +1,4 @@
 {
-  "blocks": [
-    {
-      "type": "title",
-      "label": "Titre",
-      "value": "À qui s'adresse mon accompagnement ?"
-    },
-    {
-      "type": "text",
-      "label": "Texte",
-      "value": "<p>Mon accompagnement s'adresse :</p><ul><li>aux personnes qui peuvent éprouver des <u>difficultés à réguler leurs émotions</u> (stress, angoisse, peur, colère...) incontrôlées ou non adaptées.</li><li>aux personnes qui ont une <u>faible estime d'eux même</u>, <u>qui ont des croyances limitantes</u> sans même s'en apercevoir</li><li>aux personnes qui ont du mal <u>à se faire confiance</u>, à voir l'avenir avec sérénité</li><li>aux personnes qui ont des <u>blocages</u>, des <u>souffrances</u>, des <u>blessures traumatiques concientes ou inconscientes</u></li><li><u>aux personnes qui se sentent perdues, différentes, qui ne se sentent rejetées ou pas en adéquation avec ce Monde</u></li></ul><p>Ces problèmes ont généralement des conséquences sur le corps ou leur environnement :</p><ul><li>tensions musculaires, <strong>douleurs corporelles</strong></li><li><strong>troubles du sommeil</strong>, fatigue chronique</li><li>être hypertendu</li><li>troubles digestifs (douleurs abdominales, nausées, colites...)</li><li>difficultés de concentration</li><li>isolement social pour éviter des déclencheurs d'angoisse ou autre</li><li>pensées intrusives, flash-back qui font revivre des événements négatifs, anxiogènes, stressant, traumatisants</li></ul><p class=\"bonne-nouvelle\"><strong>Bonne nouvelle</strong> <span class=\"smiley\" aria-hidden=\"true\">😊</span> ! Vous êtes prêt à ce que ça change maintenant.</p>"
-    }
-  ]
+  "title": "À qui s'adresse mon accompagnement ?",
+  "content": "<p>Mon accompagnement s'adresse :</p><ul><li>aux personnes qui peuvent éprouver des <u>difficultés à réguler leurs émotions</u> (stress, angoisse, peur, colère...) incontrôlées ou non adaptées.</li><li>aux personnes qui ont une <u>faible estime d'eux même</u>, <u>qui ont des croyances limitantes</u> sans même s'en apercevoir</li><li>aux personnes qui ont du mal <u>à se faire confiance</u>, à voir l'avenir avec sérénité</li><li>aux personnes qui ont des <u>blocages</u>, des <u>souffrances</u>, des <u>blessures traumatiques concientes ou inconscientes</u></li><li><u>aux personnes qui se sentent perdues, différentes, qui ne se sentent rejetées ou pas en adéquation avec ce Monde</u></li></ul><p>Ces problèmes ont généralement des conséquences sur le corps ou leur environnement :</p><ul><li>tensions musculaires, <strong>douleurs corporelles</strong></li><li><strong>troubles du sommeil</strong>, fatigue chronique</li><li>être hypertendu</li><li>troubles digestifs (douleurs abdominales, nausées, colites...)</li><li>difficultés de concentration</li><li>isolement social pour éviter des déclencheurs d'angoisse ou autre</li><li>pensées intrusives, flash-back qui font revivre des événements négatifs, anxiogènes, stressant, traumatisants</li></ul><p class=\"bonne-nouvelle\"><strong>Bonne nouvelle</strong> <span class=\"smiley\" aria-hidden=\"true\">😊</span> ! Vous êtes prêt à ce que ça change maintenant.</p>"
 }
