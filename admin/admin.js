@@ -242,20 +242,36 @@ const admin = {
       return;
     }
 
-    admin.toast('Publication en cours sur GitHub...');
+    admin.toast('Enregistrement en cours...');
 
     try {
+      // Formater les blocs pour le site
+      const sectionData = {};
+      const titleBlock = data.blocks.find(b => b.type === 'title');
+      const textBlock = data.blocks.find(b => b.type === 'text');
+
+      if (titleBlock) sectionData.title = titleBlock.value;
+      if (textBlock) {
+        if (current === 'accueil') {
+          sectionData.hero_intro = textBlock.value;
+          sectionData.details = textBlock.value;
+        } else {
+          sectionData.content = textBlock.value;
+        }
+      }
+      sectionData.blocks = data.blocks;
+
       const r = await fetch(API_CONTENT, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ page: current, content: data })
+        body: JSON.stringify({ page: current, content: sectionData })
       });
 
       if (r.ok) {
-        admin.toast('✓ Sauvegardé et publié en ligne !');
+        admin.toast('✓ Sauvegardé en ligne avec succès !');
         dirty = 0;
         admin.updateSaveInfo();
       } else if (r.status === 401 || r.status === 403) {
