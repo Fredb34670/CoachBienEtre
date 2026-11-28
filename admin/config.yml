@@ -9,6 +9,10 @@ locale: fr
 media_folder: "images"
 public_folder: "/images"
 
+# Adresse du site publié : rend fonctionnel le bouton "Vérifier l'aperçu"
+# (ouvre le site en ligne dans un nouvel onglet)
+site_url: "https://happy-therapie-holistique.netlify.app"
+
 collections:
   - name: "pages"
     label: "Pages du site"
