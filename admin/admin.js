@@ -243,30 +243,45 @@ const admin = {
     }
 
     try {
-      const r = await fetch(API_CONTENT, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ page: current, content: data })
-      });
+      // Générer le fichier JSON de la page courante au format standard
+      // (on convertit les blocs en structure lisible pour le site)
+      const sectionData = {};
+      const titleBlock = data.blocks.find(b => b.type === 'title');
+      const textBlock = data.blocks.find(b => b.type === 'text');
+      const imgBlock = data.blocks.find(b => b.type === 'image');
 
-      if (r.ok) {
-        const res = await r.json();
-        admin.toast('✓ Sauvegardé');
-        dirty = 0; admin.updateSaveInfo();
-      } else if (r.status === 401 || r.status === 403) {
-        // Jeton invalide ou expiré → reconnexion
-        localStorage.removeItem(TOKEN_KEY);
-        admin.toast('Session expirée ou non autorisée : reconnectez-vous');
-        admin.logout();
-      } else {
-        const err = await r.json().catch(() => ({}));
-        admin.toast('Erreur: ' + (err.error || 'serveur'));
+      if (titleBlock) sectionData.title = titleBlock.value;
+      if (textBlock) {
+        if (current === 'accueil') {
+          sectionData.hero_intro = textBlock.value;
+          sectionData.details = textBlock.value;
+        } else {
+          sectionData.content = textBlock.value;
+        }
       }
+      if (imgBlock && imgBlock.file) {
+        sectionData.hero_image = imgBlock.file;
+      }
+      // Conserver aussi les blocks bruts au cas où
+      sectionData.blocks = data.blocks;
+
+      // Créer un lien de téléchargement automatique pour le fichier JSON
+      const jsonString = JSON.stringify(sectionData, null, 2);
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${current}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      admin.toast(`✓ Fichier ${current}.json téléchargé !`);
+      dirty = 0;
+      admin.updateSaveInfo();
     } catch (e) {
-      admin.toast('Erreur réseau');
+      admin.toast('Erreur lors de la génération du fichier');
     }
   },
 
