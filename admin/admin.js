@@ -164,12 +164,6 @@ const admin = {
     return `
       <div class="block" data-i="${i}">
         <div class="block-head"><span class="block-label">${admin.escapeHtml(b.label || 'Texte')}</span><button class="block-del" onclick="admin.delBlock(${i})">✕</button></div>
-        <div class="toolbar">
-          <button onclick="document.execCommand('bold')">B</button>
-          <button onclick="document.execCommand('italic')">I</button>
-          <button onclick="document.execCommand('underline')">U</button>
-          <button onclick="document.execCommand('insertUnorderedList')">•</button>
-        </div>
         <div class="rich trumbowyg" data-i="${i}" contenteditable="true" oninput="admin.markDirty()">${b.value || ''}</div>
       </div>`;
   },
@@ -180,7 +174,14 @@ const admin = {
     document.querySelectorAll('.rich').forEach(el => {
       if (!el.hasAttribute('data-trumbowyg')) {
         if (typeof $ !== 'undefined' && $.fn.trumbowyg) {
-          $(el).trumbowyg({ autoparse: false });
+          $(el).trumbowyg({
+            autoparse: false,
+            btns: [
+              ['viewHTML'], ['formatting'], ['bold', 'italic', 'underline', 'strikethrough'],
+              ['foreColor', 'backColor'], ['justifyLeft', 'justifyCenter', 'justifyRight'],
+              ['unorderedList', 'orderedList'], ['horizontalRule'], ['removeformat'], ['fullscreen']
+            ]
+          });
           el.setAttribute('data-trumbowyg', 'true');
         }
         el.addEventListener('input', () => admin.markDirty());
