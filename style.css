@@ -107,12 +107,12 @@ body {
   background: transparent;
 }
 
-/* Style unifié et alterné des onglets */
+/* Style unifié des onglets */
 .binder-tab {
-  background: #e8d8e8;
+  background: #fec2e7;
   border: none;
   border-radius: 8px 8px 0 0;
-  color: #6a4d6a;
+  color: #4a3d4a;
   padding: 0.7rem 1.15rem;
   cursor: pointer;
   font-family: Georgia, serif;
@@ -128,19 +128,8 @@ body {
   align-self: flex-end;
 }
 
-/* Alternance pour l'effet intercalaire : clair / moyen */
-.binder-tab:nth-child(odd) {
-  background: #fec2e7;
-  color: #4a3d4a;
-}
-
-.binder-tab:nth-child(even) {
-  background: #fd88d6;
-  color: white;
-}
-
 .binder-tab:hover:not(.active) {
-  background: #d8c0d8;
+  background: #fd88d6;
   color: #4a3d4a;
 }
 
