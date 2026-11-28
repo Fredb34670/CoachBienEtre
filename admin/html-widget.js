@@ -59,29 +59,6 @@
       this.emit();
     },
 
-    // Met le texte sélectionné en violet avec la classe exacte du site.
-    wrapViolet: function () {
-      var el = this.editor;
-      if (!el) return;
-      el.focus();
-      var sel = window.getSelection();
-      if (!sel || sel.rangeCount === 0 || sel.isCollapsed) return;
-      var range = sel.getRangeAt(0);
-      var span = document.createElement('span');
-      span.className = 'accent-violet';
-      try {
-        range.surroundContents(span);
-      } catch (e) {
-        span.appendChild(range.extractContents());
-        range.insertNode(span);
-      }
-      sel.removeAllRanges();
-      var newRange = document.createRange();
-      newRange.selectNodeContents(span);
-      sel.addRange(newRange);
-      this.emit();
-    },
-
     // Mémorise la sélection avant d'ouvrir un sélecteur de couleur.
     saveSelection: function () {
       var el = this.editor;
@@ -256,33 +233,6 @@
           this.button('H3', 'Titre de section', 'formatBlock', 'H3'),
           this.button('H4', 'Sous-titre', 'formatBlock', 'H4'),
           this.button('Titre normal', 'Revenir au texte normal', 'formatBlock', 'P'),
-          h(
-            'button',
-            {
-              type: 'button',
-              title: 'Mettre le texte sélectionné en violet',
-              onMouseDown: function (e) {
-                e.preventDefault();
-              },
-              onClick: function () {
-                self.wrapViolet();
-              },
-              style: {
-                background: '#ea39c1',
-                border: '1px solid #c026a0',
-                borderRadius: '4px',
-                color: '#fff',
-                cursor: 'pointer',
-                fontSize: '13px',
-                fontWeight: 'bold',
-                lineHeight: '1',
-                padding: '7px 9px',
-                marginRight: '4px',
-                marginBottom: '4px',
-              },
-            },
-            'Violet'
-          ),
           this.colorButton('Couleur du texte', textColorIcon, 'textColorInput'),
           this.colorButton('Couleur de fond du texte', bgColorIcon, 'bgColorInput'),
           h('input', {
